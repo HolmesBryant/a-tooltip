@@ -1,41 +1,47 @@
 export default class ATooltip extends HTMLElement {
 
-	/**
-	 * default, modal or inline
-	 */
-	#position = 'default';
+	#active = false;
 
-	static observedAttributes = ['position'];
+	/**
+	 * 'default' or 'click'
+	 */
+	#activate = 'default';
+
+	/**
+	 * 'center', 'inline' or modal'
+	 */
+	#position = 'inline';
+
+
+	static observedAttributes = ['position', 'activate', 'active'];
 
 	static tmpl = `
 		<style>
 			:host {
-				--size: 35px;
+				--symbol-size: 35px;
 				--symbol-color: white;
-				--bg-color: dodgerblue;
+				--symbol-background: dodgerblue;
 				--accent-color: orange;
 				--border-color: silver;
-				--width: 400px;
-				display: inline-block;
-				position: relative;
+				--message-width: 400px;
 			}
 
 			button {
 				align-items: center;
-				background-color: var(--bg-color);
+				background-color: var(--symbol-background);
 				border: 1px solid var(--border-color);
 				border-radius: 50%;
 				color: var(--symbol-color);
 				cursor: pointer;
-				display: flex;
+				display: inline-flex;
 				flex-wrap: wrap;
-				font-size: var(--size);
+				font-size: var(--symbol-size);
 				font-weight: bold;
-				height: var(--size);
+				height: var(--symbol-size);
 				justify-content: center;
 				line-height: 0;
 				outline: none;
-				width: var(--size);
+				width: var(--symbol-size);
 			}
 
 			button:focus,
@@ -53,12 +59,11 @@ export default class ATooltip extends HTMLElement {
 				border-radius: 5px;
 				box-shadow: 2px 2px 5px black;
 				padding: 0;
-				width: var(--width);
 			}
 
 			dialog > form {
 				display: flex;
-				justify-content: end;
+				justify-content: space-between;
 			}
 
 			dialog > form > button {
@@ -67,22 +72,54 @@ export default class ATooltip extends HTMLElement {
 				border-top-right-radius: 5px;
 			}
 
+			.inline {
+				position: relative;
+			}
+
+			.inline dialog {
+				position: absolute;
+				left: var(--symbol-size);
+				width: clamp(50px, 50vw, 400px);
+			}
+
 			#message {
 				overflow-wrap: normal;
 				padding: 1rem;
+				max-width: var(--message-width);
+			}
+
+			#title {
+				padding-top: .5rem;
+				padding-left: .5rem;
+			}
+
+			#title ::slotted(*) {
+				margin: 0;
+			}
+
+			#wrapper {
+				display: inline-grid;
 			}
 		</style>
-		<button id="show" tabindex="0">
-			<slot name="symbol">?</slot>
-		</button>
-		<dialog>
-			<form method="dialog">
-				<button>×</button>
-			</form>
-			<div id="message">
-				<slot name="message">...</slot>
-			</div>
-		</dialog>
+		<div id="wrapper">
+
+			<button id="show" tabindex="0">
+				<slot name="symbol">?</slot>
+			</button>
+
+			<dialog>
+				<form method="dialog">
+					<div id="title">
+						<slot name="title"></slot>
+					</div>
+					<button>×</button>
+				</form>
+				<div id="message">
+					<slot name="message">...</slot>
+				</div>
+			</dialog>
+
+		</div>
 	`;
 
 	constructor() {
@@ -97,16 +134,45 @@ export default class ATooltip extends HTMLElement {
 
 	connectedCallback() {
 		this.abortController = new AbortController();
+		this.wrapper = this.shadowRoot.querySelector('#wrapper');
 		this.dialog = this.shadowRoot.querySelector('dialog');
 		this.showBtn = this.shadowRoot.querySelector('#show');
-		this.showBtn.addEventListener('click', () => {
+		this.addListeners();
+		if (this.active) {
 			this.showDialog();
-		}, { signal:this.abortController.signal });
+		}
 	}
 
 	disconnectedCallback() {
 		this.abortController.abort();
 		this.abortController = null;
+	}
+
+	/**
+	 * Check out the popover api
+	 */
+	addListeners() {
+		switch (this.activate) {
+		case 'click':
+			this.showBtn.addEventListener('click', () => {
+				this.showDialog();
+			}, { signal:this.abortController.signal });
+			break;
+		default:
+			this.showBtn.addEventListener('click', () => {
+				this.showDialog();
+			}, { signal:this.abortController.signal });
+			this.showBtn.addEventListener('mouseenter', () => {
+				this.showDialog();
+			}, { signal:this.abortController.signal });
+			this.showBtn.addEventListener('mouseleave', () => {
+				this.hideDialog();
+			}, { signal:this.abortController.signal });
+		}
+	}
+
+	hideDialog() {
+		this.dialog.close();
 	}
 
 	showDialog() {
@@ -115,12 +181,24 @@ export default class ATooltip extends HTMLElement {
 			this.dialog.showModal();
 			break;
 		case 'inline':
-			this.dialog.style.top = 0;
-			this.dialog.style.left = 0;
+			// this.dialog.style.top = 0;
+			this.wrapper.classList.add('inline');
+			// this.dialog.style.left = 0;
+			// this.dialog.style.right = 0;
 		default:
 			this.dialog.show();
+			// this.showBtn.style.display = 'flex';
 		}
 	}
+
+	get active() { return this.#active }
+	set active(value) {
+		this.#active = !(value === 'false' || value === false);
+		if (!this.active) this.hideDialog();
+	}
+
+	get activate() { return this.#activate }
+	set activate(value) { this.#activate = value }
 
 	get position() { return this.#position }
 	set position(value) { this.#position = value }

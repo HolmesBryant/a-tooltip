@@ -1,0 +1,70 @@
+@layer a-tabset {
+  a-tabset {
+  	--bg1-color: rgb(250,250,250);
+    --bg2-color: rgb(240,240,240);
+    --bg3-color: white;
+    --text-color: rgb(40,40,40);
+    --border-color: silver;
+    --accent-color: orange;
+    --pad: .5rem;
+    --justify: start;
+
+    & .a-tabset-tab {
+      border: 1px solid var(--border-color);
+      border-bottom-width: 0;
+      padding: var(--pad);
+    }
+
+    & .a-tabset-tab:active {
+      background-color: var(--accent-color);
+    }
+
+    & .a-tabset-tab.active {
+      background-color: var(--bg3-color);
+    }
+
+    & .a-tabset-tab.column {
+      border-right-width: 0;
+      border-bottom-width: 1px;
+      flex: 0;
+    }
+
+    & .a-tabset-tab.column-reverse {
+      border-left-width: 0;
+      border-bottom-width: 1px;
+      flex: 0;
+    }
+
+    & .a-tabset-tab.column.active,
+    & .a-tabset-tab.column-reverse.active {}
+
+    & .a-tabset-content {
+      background-color: var(--bg3-color);
+      border: 1px solid var(--border-color);
+      padding: var(--pad);
+    }
+
+    & .a-tabset-content.active {
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    a-tabset {
+      --bg1-color: rgb(35,35,35);
+      --bg2-color: rgb(40,40,40);
+      --bg3-color: rgb(60,60,60);
+      --border-color: dimgray;
+      --accent-color: orange;
+      --text-color: rgb(240,240,240);
+    }
+  }
+
+  a-tabset::part(main) {
+    border-radius: var(--pad);
+  }
+
+  a-tabset::part(tabs){}
+  a-tabset::part(content) {}
+
+} /* @layer */
+

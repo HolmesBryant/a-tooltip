@@ -1,0 +1,634 @@
+@layer a-form {
+	a-form {
+		--bg1-color: rgb(250,250,250);
+		--bg2-color: rgb(245,245,245);
+		--bg3-color: white;
+		--border-color: silver;
+		--fail-color: hsl(6, 93%, 80%);
+		--pass-color: hsl(112, 70%, 75%);
+		--text-color-: rgb(40,40,40);
+		--accent-color: dodgerblue;
+		--accent-text: rgb(240,240,240);
+		--gap: .5rem;
+		--min: 45px;
+		--min-panel: 270px;
+		--pad: .5rem;
+
+	/****** Backgrounds ******/
+
+			background-color: var(--bg1-color);
+
+			& details > *,
+			& fieldset,
+			& section,
+			& input::file-selector-button
+			{ background-color: var(--bg2-color); }
+
+			& .primary:hover,
+			& button,
+			& input,
+			& input::before,
+			& select,
+			& textarea
+			{ background-color: var(--bg3-color); }
+
+			& input::-webkit-slider-thumb
+			{ background-color: var(--bg3-color); }
+
+			& input::-moz-range-thumb
+			{ background-color: var(--bg3-color); }
+
+			& .primary,
+			& option:hover,
+			& button:hover,
+			& option:checked,
+			& input:checked::before,
+			& input[type="button"]:hover,
+			& input[type="image"]:hover,
+			& input[type="submit"]:hover,
+			& input[type="reset"]:hover,
+			& input::file-selector-button:hover
+			{ background-color: var(--accent-color); }
+
+			& progress::-webkit-progress-value
+			{ background-color: var(--accent-color); }
+
+			& progress::-moz-progress-bar
+			{ background-color: var(--accent-color); }
+
+			& input::-webkit-slider-thumb:hover
+			{ background-color: var(--accent-color); }
+
+			& input::-moz-range-thumb:hover
+			{ background-color: var(--accent-color); }
+
+			& .icon[slot="error"] {
+				background-color: var(--fail-color);
+			}
+
+			& .icon[slot="success"] {
+				background-color: var(--pass-color);
+			}
+
+			& hr
+			{ background-color: silver; }
+
+			& progress
+			{ background-color: transparent; }
+
+			& progress::-webkit-progress-bar
+			{ background: transparent; }
+
+	/****** Borders / Outlines ******/
+
+			&,
+			& button,
+			& fieldset,
+			& input,
+			& input::before,
+			& progress,
+			& select,
+			& textarea
+			{ border: 1px solid var(--border-color); }
+
+			& input::-webkit-slider-thumb
+			{ border: 1px solid var(--border-color); }
+
+			& input::-moz-range-thumb
+			{ border: 1px solid var(--border-color); }
+
+			& option
+			{ border-bottom: 1px solid var(--border-color); }
+
+			& input::file-selector-button {
+				border-color: var(--border-color);
+				border-style: solid;
+				border-width: 0 1px 0 0;
+			}
+
+			& hr,
+			& option:last-child
+			{ border: none; }
+
+			& input:user-valid:not([type="submit"]):not([type="reset"]):not([type="range"])
+			{ border-color: var(--pass-color) }
+
+			& :user-invalid
+			{ border-color: var(--fail-color) }
+
+			&,
+			& button,
+			& fieldset,
+			& hr,
+			& input,
+			& input::before,
+			& option,
+			& progress,
+			& progress::-webkit-progress-value,
+			& progress::-webkit-progress-bar,
+			& section,
+			& select,
+			& textarea,
+			& .icon[slot="error"],
+			& .icon[slot="success"]
+			{ border-radius: .5rem; }
+
+			& input[type=range]::-webkit-slider-thumb
+			{ border-radius: 50%; }
+
+			/* doesn't seem to work if I group it with other selectors */
+			& input[type=range]::-moz-range-thumb
+			{ border-radius: 50%; }
+
+			& input[type="radio"],
+			& input[type="radio"]::before
+			{ border-radius: 50%; }
+
+			& option
+			{ border-radius: 0; }
+
+			& input::file-selector-button
+			{ border-radius: .5rem 0 0 .5rem; }
+
+			& option:first-child
+			{ border-radius: .5rem .5rem 0 0; }
+
+			& option:last-child
+			{ border-radius: 0 0 .5rem .5rem; }
+
+			& :focus-visible {
+				border-color: transparent;
+				outline: 1px solid var(--accent-color);
+			}
+
+			& input:checked::before
+			{ outline: 2px solid var(--accent-color); }
+
+	/****** Accent ******/
+
+		& input
+		{ accent-color: var(--accent-color); }
+
+	/****** Text ******/
+
+		& div:has(input[required]) label::after {
+	      content: "*";
+	      color: var(--accent-color);
+	  }
+
+		& div > label.required:after
+		{ color: var(--fail-color) }
+
+		&,
+		& button,
+		& input,
+		& fieldset,
+		& div > label,
+		& legend,
+		& option,
+		& select,
+		& textarea,
+		& input::file-selector-button
+		{ color: var(--text-color); }
+
+		& .primary,
+		& option:checked,
+		& input:checked::before
+		{ color: var(--accent-text); }
+
+		& .primary:hover
+		{color: var(--text-color); }
+
+		& option,
+		& button,
+		& input,
+		& fieldset,
+		& div > label,
+		& legend,
+		& option,
+		& select,
+		& textarea
+		{font-size: 1rem; letter-spacing: .1rem; }
+
+		& input[type="checkbox"]::before,
+		& input[type="radio"]::before
+		{ font-size: var(--min); }
+
+		& div > label.required:after
+		{ font-size: small }
+
+		& select:not([multiple]):not([size]) option
+		{font-size: larger; }
+
+		& .icon[slot="error"],
+		& .icon[slot="success"]
+		{ font-size: 4rem; }
+
+		& button,
+		& legend,
+		& option,
+		& select,
+		& div > label,
+		& input[type="button"],
+		& input[type="reset"],
+		& input[type="submit"],
+		& [slot="error"],
+		& [slot="waiting"],
+		& [slot="success"],
+		& input::file-selector-button
+		{ font-weight:bold; }
+
+		& .primary,
+		& option:checked
+		{ text-shadow: 1px 1px 1px black; }
+
+	/****** Shadows ******/
+
+		& option:hover,
+		&  button:hover,
+		& input[type="button"]:hover,
+		& input[type="image"]:hover,
+		& input[type="submit"]:hover,
+		& input[type="reset"]:hover,
+		& input[type=file]::file-selector-button:hover
+		{ box-shadow: 2px 2px 5px black; }
+
+		& button:active,
+		& option:active,
+		& option:checked,
+		& input[type="button"]:active,
+		& input[type="image"]:active,
+		& input[type="submit"]:active,
+		& input[type="reset"]:active,
+		& input[type=file]::file-selector-button:active
+		{ box-shadow: inset 2px 2px 5px black; }
+
+		& input[type=range]::-webkit-slider-thumb:hover
+		{box-shadow: 2px 2px 5px black; }
+
+		& input[type=range]::-moz-range-thumb:hover
+		{box-shadow: 2px 2px 5px black; }
+
+		& input[type=range]:active::-webkit-slider-thumb
+		{box-shadow: inset 2px 2px 5px black; }
+
+		& input[type=range]:active::-moz-range-thumb
+		{box-shadow: inset 2px 2px 5px black; }
+
+		& input[type=range]:focus::-webkit-slider-thumb
+		{box-shadow: inset 2px 2px 5px black; }
+
+		& input[type=range]:focus::-moz-range-thumb
+		{box-shadow: inset 2px 2px 5px black; }
+
+	/****** Cursor ******/
+
+		& button,
+		& select,
+		& div > label,
+		& input[type="radio"],
+		& input[type="color"],
+		& input[type="range"],
+		& input[type="reset"],
+		& input[type="button"],
+		& input[type="submit"],
+		& input[type="checkbox"],
+		& input::file-selector-button
+		{ cursor: pointer; }
+
+		& input:disabled,
+		& *[disabled]
+		{ cursor: not-allowed; }
+
+	/****** Scrollbar ******/
+
+		& { scrollbar-color: var(--bg2-color) var(--bg3-color);
+			scrollbar-gutter: stable both-edges;
+		}
+
+	/****** Structure ******/
+
+		& {
+			display: inline-block;
+			overflow: auto;
+		}
+
+		& * {
+			box-sizing: border-box;
+			transition: all .25s;
+		}
+
+		& button,
+		& input[type=submit],
+		& input[type=reset]
+		{margin: var(--gap); }
+
+		& button,
+		& select:not([size]),
+		& input {
+			min-height: var(--min);
+			max-height: var(--min);
+			min-width: var(--min);
+			padding: var(--pad);
+		}
+
+		& div:not([hidden]) {
+			align-items: stretch;
+			display: flex;
+			flex-direction: column;
+			flex-wrap: wrap;
+			gap: 0 var(--gap);
+			justify-content: center;
+			margin: 1rem 0;
+		}
+
+		& div.row
+		{ align-items: center; }
+
+		& div > *,
+		& section > *,
+		& fieldset > *
+		{ flex: 1; }
+
+		& fieldset {
+			display: flex;
+			flex-direction: column;
+			flex-wrap: wrap;
+			gap: var(--gap);
+			overflow-x: hidden;
+			overflow-y: auto;
+			padding: var(--pad);
+		}
+
+		& header {display: block;
+			flex-grow: 0;
+			flex-shrink: 0;
+		}
+
+		& hr {
+			min-width: 100%;
+			max-height: 5px;
+		}
+
+		& .row > hr {
+			min-width: 5px;
+			margin: 0;
+			max-width: 5px;
+			max-height: 100%;
+		}
+
+		& input:disabled
+		{opacity: 0.7; }
+
+		& input[type="checkbox"],
+		& input[type="radio"] {
+			appearance: none;
+			height: var(--min);
+			width: var(--min);
+		}
+
+		& input:checked::before {
+			content: "";
+			line-height: 0;
+			display: flex;
+			height: 100%;
+			width: 100%;
+			align-items: center;
+			justify-content: center;
+		}
+
+		& input[type="checkbox"]:checked::before {
+			content: "✔";
+			content: "✖";
+		}
+
+		& input[type="radio"]:checked::before
+		{content: "⬤"; }
+
+		& input[type="color"],
+		& input[type="checkbox"],
+		& input[type="radio"] {
+			flex: 0;
+			flex-basis: var(--min);
+			padding: 0;
+			width: var(--min);
+		}
+
+		& input[type="file"]
+		{ padding: 0; }
+
+		& input::file-selector-button
+		{ padding: .5rem; }
+
+		/* Range/Progress */
+
+		& div:has(input[type=range]) > label::after {
+			content: attr(data-value);
+			margin: 0 var(--gap);
+		}
+
+		& input[type=range] {
+			appearance: none;
+			-webkit-appearance: none;
+			width: 100%;
+			max-height: 1.15rem;
+			min-height: var(--pad);
+		}
+
+		& input::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			height: var(--min);
+			width: var(--min);
+		}
+
+		& input::-moz-range-thumb {
+			appearance: none;
+			height: var(--min);
+			width: var(--min);
+		}
+
+		& div:has(input[type=range]) > label
+		{ margin-bottom: var(--gap); }
+
+		& div > label {
+			flex: 0;
+			white-space: nowrap;
+		}
+
+		& option {
+			align-items: center;
+			display: flex;
+			min-height: var(--min);
+			padding: 0 var(--pad);
+		}
+
+		& progress {
+			-webkit-appearance: none;
+			-moz-appearance: none;
+			appearance: none;
+			inline-size: 100%;
+			min-height: 1rem;
+		}
+
+		& div:has(progress) label::after {
+			content: attr(data-value);
+			font-weight: normal;
+			margin: 0 var(--gap);
+		}
+
+		& progress::-webkit-progress-value
+		{ min-height: 1rem; }
+
+		& section {
+			display: flex;
+			flex-direction: column;
+			flex-wrap: nowrap;
+			gap: var(--gap);
+			margin: 1rem 0;
+			padding: var(--pad);
+		}
+
+		& section.row,
+		& section > div,
+		& section > section,
+		& section.row section + section
+		{ margin: 0; }
+
+		& section + section
+		{ margin: 1rem 0; }
+
+		& select {
+			min-height: var(--min);
+			min-width: var(--min);
+			overflow-y: auto;
+		}
+
+		& textarea {
+			min-height: 10rem;
+			min-width: 10rem;
+			padding: var(--pad);
+			width: 100%;
+		}
+
+		& .required:after {
+			content: "*";
+			font-size: x-large;
+			vertical-align: super;
+		}
+
+	/**** Classes ****/
+
+		& .center > *,
+		& .start > *,
+		& .end > *,
+		& .space-around > *,
+		& .space-between > *
+		{ flex: 0 1 max-content; }
+
+		& .center {
+			justify-content: center;
+			align-items: center;
+		}
+
+		& section.row.center
+		{align-items: normal; }
+
+		& .end {
+			align-content: flex-end;
+			justify-content: flex-end;
+		}
+
+		& .reverse.end {
+			align-content: flex-start;
+			justify-content: flex-start;
+		}
+
+		& .nowrap
+		{ flex-wrap: nowrap}
+
+		& .reverse
+		{ flex-direction: column-reverse; }
+
+		wigit-form .left
+		{align-items: start; }
+
+		& .right
+		{align-items: end; }
+
+		& .row {
+			flex-direction: row;
+			flex-wrap: wrap;
+		}
+
+		& .row.reverse
+		{ flex-direction: row-reverse; }
+
+		& .space-around{
+			justify-content: space-around;
+			align-content: space-around;
+		}
+
+		& .space-between
+		{ justify-content: space-between; }
+
+		& .row.space-between
+		{ align-content: space-between; }
+
+		& .reverse.start {
+			align-content: flex-end;
+			justify-content: flex-end;
+		}
+
+		& .flex0
+		{ flex: 0; }
+
+		& .flex1
+		{ flex: 1; }
+
+		& .flex2
+		{ flex: 2; }
+
+		& .fb240
+		{ flex-basis: 240px; }
+
+		& .fb320
+		{ flex-basis: 320px; }
+
+		& .fb480
+		{ flex-basis: 480px; }
+
+		& .fb768
+		{ flex-basis: 768px; }
+
+		& .fb1024
+		{ flex-basis: 1024px; }
+}
+
+/****** Media Queries ******/
+
+	@media (prefers-color-scheme: dark) {
+		a-form {
+			--bg1-color: rgb(35,35,35);
+			--bg2-color: rgb(40,40,40);
+			--bg3-color: rgb(60,60,60);
+			--border-color: dimgray;
+			--text-color: rgb(240,240,240);
+			--fail-color: hsl(6, 93%, 40%);
+			--pass-color: hsl(112, 70%, 40%);
+		}
+	}
+
+	@media only screen and (max-width: 1024px) {
+		a-form {
+			--pad: .25rem;
+			--gap: .25rem;
+		}
+	}
+
+	@media only screen and (max-width: 380px) {
+		a-form {
+			--pad: 0;
+			--gap: 5px;
+		}
+	}
+} /* layer */

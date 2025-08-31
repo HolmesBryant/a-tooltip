@@ -5,17 +5,109 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>A-Tooltip Web Component</title>
 	<script type="module" src="src/a-tooltip.js"></script>
+	<script type="module" src="extra/a-form.min.js"></script>
+	<script type="module" src="extra/a-tabset.min.js"></script>
+	<script defer src="extra/scripts.js"></script>
+
+	<link rel="stylesheet" href="extra/styles.css">
+	<link rel="stylesheet" href="extra/a-form.css">
+	<link rel="stylesheet" href="extra/a-tabset.css">
 </head>
 <body>
-	<div>
-		<label>A Label</label>
-		<a-tooltip>
-			<b slot="symbol">!</b>
-			<div slot="message">
-Eiusmod nulla ut ad dolore mollit cillum officia commodo dolor do sed consequat officia in culpa excepteur nostrud duis do elit id occaecat cupidatat sed aliqua excepteur eu labore anim amet aliqua in in incididunt nostrud duis sed excepteur labore ullamco irure aliqua et esse in voluptate.
+	<h1>A-Tooltip Web Component</h1>
+	<p>A custom element for displaying a tooltip: <a href="https://github.com/HolmesBryant/a-tooltip">Github Repo</a></p>
+
+	<details>
+	<summary>README</summary>
+		<div id="instructions"> </div>
+	</details>
+
+	<h2>Demo</h2>
+	<section class="flex row">
+		<div class="flex2">
+				<a-tabset>
+					<strong slot="title">Attributes</strong>
+					<div slot="content">
+						<a-form>
+							<div>
+								<label for="active-attr">active</label>
+								<select id="active-attr">
+									<option>false</option>
+									<option>true</option>
+								</select>
+							</div>
+
+							<div>
+								<label for="activate-attr">activate</label>
+								<select id="activate-attr">
+									<option>default</option>
+									<option>click</option>
+								</select>
+							</div>
+
+							<div>
+								<label for="position-attr">Position</label>
+								<select id="position-attr">
+									<option>inline</option>
+									<option>center</option>
+									<option>modal</option>
+								</select>
+							</div>
+						</a-form>
+					</div>
+
+					<strong slot="title">CSS Properties</strong>
+					<div slot="content">
+						<a-form>
+							<div>
+								<label for="css-symbol-size">--symbol-size</label>
+								<input id="css-symbol-size">
+							</div>
+
+							<div>
+								<label for="css-symbol-color">--symbol-color</label>
+								<input id="css-symbol-color">
+							</div>
+
+							<div>
+								<label for="css-symbol-background">--symbol-background</label>
+								<input id="css-symbol-background">
+							</div>
+
+							<div>
+								<label for="css-accent-color">--accent-color</label>
+								<input id="css-accent-color">
+							</div>
+
+							<div>
+								<label for="css-border-color">--border-color</label>
+								<input id="css-border-color">
+							</div>
+
+							<div>
+								<label for="css-message-width">--message-width</label>
+								<input id="css-message-width">
+							</div>
+						</a-form>
+					</div>
+				</a-tabset>
+		</div>
+
+		<div class="flex column start flex1">
+			<label>A Label</label>
+
+			<div class="flex">
+				<input value="some value">
+
+				<a-tooltip>
+					<b slot="symbol">!</b>
+					<h3 slot="title">Tooltip</h3>
+					<div slot="message">
+						foo
+					</div>
+				</a-tooltip>
 			</div>
-		</a-tooltip>
-	</div>
-	<input value="some value">
+		</div>
+	</section>
 </body>
 </html>

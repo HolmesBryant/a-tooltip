@@ -1,7 +1,7 @@
 import terser from '@rollup/plugin-terser';
 
 export default {
-  input: 'src/ATooltip.js',
+  input: 'src/a-tooltip.js',
   output: {
     file: 'dist/a-tooltip.min.js',
     format: 'es',
