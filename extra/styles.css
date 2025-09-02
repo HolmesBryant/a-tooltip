@@ -2,11 +2,13 @@ body {
 	--bg1-color: rgb(250, 250, 250);
 	--bg2-color: #f2f2f2;
 	--bg3-color: white;
+	--bg4-color:  gainsboro;
 	--accent-color: floralwhite;
 	--border-color: silver;
 	--text-color: dimgray;
 	--min: 45px;
-	--pad: .5rem;
+	--pad: 1rem;
+	--gap:  .25rem;
 
   background: var(--bg1-color);
   color: var(--text-color);
@@ -18,6 +20,10 @@ body {
   margin: auto;
 	max-width: 1024px;
 	padding: var(--pad);
+}
+
+body * {
+	box-sizing: border-box;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -44,10 +50,14 @@ body {
 	button
 	{ background-color: var(--bg3-color) }
 
+	input,
+	select
+	{ background-color: var(--bg4-color); }
+
   button:hover,
-  button.active-tab,
   summary:hover,
-  details[open] > summary
+  details[open] > summary,
+  option:checked
   { background-color: var(--accent-color) }
 
   button:active {
@@ -57,13 +67,17 @@ body {
 /**** Borders ****/
 
 	button,
-	details
+	details,
+	input,
+	select,
+	option
 	{ border: 1px solid var(--border-color); }
 
   article,
   details,
   input,
   section,
+  select,
   summary
   { border-radius: .5rem; }
 
@@ -83,9 +97,15 @@ body {
 		font-weight: bold;
 	}
 
-	input {
-		font-size: 1rem;
-	}
+	input,
+	select,
+	option
+	{ font-size: 1rem; }
+
+	label,
+	select,
+	option
+	{ font-weight: bold; }
 
 	summary
 	{
@@ -124,8 +144,13 @@ body {
 	header
 	{ flex: 0; }
 
-	input
-	{ height:  var(--min); }
+	input,
+	select,
+	option
+	{
+		min-height: var(--min);
+		min-width: var(--min);
+	}
 
 	label
 	{ display: inline-block; }
@@ -133,23 +158,21 @@ body {
 	li
 	{ margin-bottom: 1rem; }
 
-	ul, ol
-	{ margin: 0; }
+	option {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: var(--pad);
+	}
 
 	section {
-		display: flex;
-		flex-direction: column;
-		flex-wrap: nowrap;
-		gap: var(--pad);
 		margin: 0 auto 1rem auto;
 		padding: var(--pad);
 	}
 
-	/* section > * {
-		display: flex;
-		flex-direction: column;
-		flex: 1;
-	} */
+	select::-webkit-scrollbar {
+    display: none;
+	}
 
 	summary {
 		padding: var(--pad);
@@ -158,55 +181,62 @@ body {
 		z-index: 1;
 	}
 
+	ul, ol
+	{ margin: 0; }
+
 	.flex {
-		display: flex;
 		align-items: center;
-		gap: var(--pad);
-	}
-
-	.flex1 {
-		flex: 1;
-	}
-
-	.flex2 {
-		flex: 2;
-	}
-
-	.column {
-		flex-direction: column;
-		flex: 1;
-	}
-
-	.row {
-		flex-direction: row;
+		display: flex;
 		flex-wrap: wrap;
+		gap: var(--gap);
 		justify-content: space-around;
 		overflow: auto;
 	}
 
-	.column.center {
-		align-items: center;
-	}
+	.flex1
+	{ flex: 1; }
 
-	.row.center {
-		justify-content: center;
-	}
+	.flex2
+	{ flex: 2; }
 
-	.row.end {
-		justify-content: end;
-	}
+	.column
+	{ flex-direction: column; }
 
-	.column.end {
-		align-items: end;
-	}
+	.row
+	{ flex-direction: row; }
 
-	.row.start {
-		justify-content: start;
-	}
+	.row-reverse
+	{ flex-direction: row-reverse; }
 
-	.column.start {
-		align-items: start;
-	}
+	.center
+	{ justify-content: center; }
+
+	.column.center
+	{ align-items: center; }
+
+	.end
+	{ justify-content: end; }
+
+	.column.end
+	{ align-items: end; }
+
+	.start
+	{ justify-content: start; }
+
+	.column.start
+	{ align-items: start; }
+
+	.space-between
+	{ justify-content: space-between; }
+
+	.gap2
+	{ gap: calc(var(--gap) * 2); }
+
+	.gap3
+	{ gap: calc(var(--gap) * 3); }
+
+	.gap4
+	{ gap: calc(var(--gap) * 4); }
 
 	.sticky {
 		position: sticky;

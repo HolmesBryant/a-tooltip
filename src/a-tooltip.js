@@ -12,6 +12,13 @@ export default class ATooltip extends HTMLElement {
 	 */
 	#position = 'inline';
 
+	abortController;
+
+	wrapper;
+
+	dialog;
+
+	showBtn;
 
 	static observedAttributes = ['position', 'activate', 'active'];
 
@@ -146,6 +153,10 @@ export default class ATooltip extends HTMLElement {
 	disconnectedCallback() {
 		this.abortController.abort();
 		this.abortController = null;
+	}
+
+	prop(name) {
+		return this[name];
 	}
 
 	/**
