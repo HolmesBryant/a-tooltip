@@ -6,7 +6,7 @@
 	<title>A-Tooltip Web Component</title>
 	<script type="module" src="src/a-tooltip.js"></script>
 	<script type="module" src="extra/a-tabset.js"></script>
-	<script defer src="extra/data-bind.js"></script>
+	<script type="module" src="extra/a-bind.js"></script>
 	<script defer src="extra/scripts.js"></script>
 
 	<link rel="stylesheet" href="extra/styles.css">
@@ -24,37 +24,39 @@
 	<h2>Demo</h2>
 	<section class="flex">
 		<div class="flex">
-				<a-tabset style="width:360px">
+				<a-tabset>
 					<strong slot="title">Attributes</strong>
 					<div slot="content">
 							<div class="flex">
 								<div class="flex column">
 									<label for="active-attr">active</label>
-									<select
-										id="active-attr"
-										size="2"
-										data-bind="a-tooltip:active:change:checked"
-									>
-										<option selected>false</option>
-										<option>true</option>
-									</select>
+									<a-bind o="a-tooltip" p="active" e="change" a="value">
+										<select id="active-attr" size="2">
+											<option>true</option>
+											<option>false</option>
+										</select>
+									</a-bind>
 								</div>
 
 								<div class="flex column">
 									<label for="activate-attr">activate</label>
-									<select id="activate-attr" size="2">
-										<option selected>default</option>
-										<option>click</option>
-									</select>
+									<a-bind o="a-tooltip" p="activate" e="change" a="value">
+										<select id="activate-attr" size="2">
+											<option>default</option>
+											<option>click</option>
+										</select>
+									</a-bind>
 								</div>
 
 								<div class="flex column">
 									<label for="position-attr">Position</label>
-									<select id="position-attr" size="3">
-										<option selected>inline</option>
-										<option>center</option>
-										<option>modal</option>
-									</select>
+									<a-bind o="a-tooltip" p="position" e="change" a="value">
+										<select id="position-attr" size="3">
+											<option selected>inline</option>
+											<option>center</option>
+											<option>modal</option>
+										</select>
+									</a-bind>
 								</div>
 							</div>
 					</div>
@@ -99,12 +101,14 @@
 				</a-tabset>
 		</div>
 
-		<div class="flex end flex1">
-			<div class="flex column start">
+		<div class="">
+			<div class="">
 				<label>A Label</label>
 
 				<div class="flex">
 					<input value="some value">
+
+					<!-- <div style="height:50px; width:50px; border:1px solid orange"></div> -->
 
 					<a-tooltip>
 						<b slot="symbol">!</b>
@@ -119,7 +123,7 @@
 	</section>
 
 	<section>
-		<p>Lorem ipsum est minim non ex excepteur amet anim eu ea in occaecat et commodo voluptate aliqua nostrud non ea laborum laborum sint excepteur eu magna aliquip mollit anim laborum qui ea nulla amet aliqua deserunt sit veniam dolor sunt cillum elit culpa excepteur consequat mollit cillum ullamco pariatur aliqua anim non mollit non nulla ad ex ullamco qui commodo eu adipisicing aute aute quis laboris ad ut irure eiusmod incididunt duis ut aliquip in do sed ut velit amet non reprehenderit aliquip ex ut labore pariatur dolor in ad aute non officia minim commodo proident elit voluptate tempor anim ea aliqua duis non esse enim nostrud aute nisi ea adipisicing ex sint aute anim quis dolore ut ut in incididunt pariatur laborum mollit nisi proident elit eu amet aliquip adipisicing fugiat aute in est dolore cillum in nulla mollit laborum ea duis sunt dolore do fugiat esse tempor sunt eu ullamco amet laborum tempor ex pariatur nisi aliqua esse enim esse officia id.</p>
+
 	</section>
 </body>
 </html>

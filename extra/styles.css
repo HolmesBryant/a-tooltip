@@ -238,6 +238,14 @@ body * {
 	.gap4
 	{ gap: calc(var(--gap) * 4); }
 
+	.nowrap {
+		flex-wrap: nowrap;
+	}
+
+	.wrap {
+		flex-wrap: wrap;
+	}
+
 	.sticky {
 		position: sticky;
 		top: 0;

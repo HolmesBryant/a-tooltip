@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Testing Stuff</title>
+</head>
+<body>
+<style>
+			.wrapper {
+		    position: relative;
+		    border: 1px solid lime;
+		    display: inline-flex;
+		    flex-wrap: wrap;
+		    /* justify-content: flex-end; */
+			}
+
+			#myButton {
+			    padding: 10px 20px;
+			    cursor: pointer;
+			}
+
+			dialog {
+			    /* display: none; */
+			    /* position: sticky; */
+			    top: 0;
+			    right: 0;
+			    /* left: 100%; */
+			    background-color: white;
+			    border: 1px solid #ccc;
+			    /* width: clamp(50px, 360px, 100vw); */
+			}
+
+			#myButton:hover + .dialog {
+			    display: block;
+			}
+
+		</style>
+
+
+		<div class="wrapper">
+			<div style="width:600px; border:1px solid orange"></div>
+			<button id="myButton">Open Dialog</button>
+
+			<dialog open>
+				<p>The is a message inside a dialog element.</p>
+				<!-- <p>Mollit commodo laborum occaecat anim ut magna nulla ad elit eiusmod quis cupidatat adipisicing veniam pariatur amet dolore nulla do eu do adipisicing nisi nulla id minim pariatur labore nostrud adipisicing laborum irure occaecat in cupidatat in quis tempor in dolor elit in dolor eiusmod aliqua dolor nisi commodo aute veniam quis ad minim et sunt minim duis officia incididunt sint in commodo deserunt aute excepteur do eu nulla qui sed nostrud sit tempor ex officia sit ad ad fugiat voluptate ut deserunt aliqua occaecat dolore consectetur ea esse in excepteur aliquip ullamco veniam dolore voluptate eu ea occaecat id duis labore ut aute laboris deserunt in exercitation adipisicing minim tempor anim id nostrud ad cupidatat ea tempor non sed consectetur ea ex nisi aute ex enim amet sint est occaecat nostrud cupidatat esse nulla pariatur veniam anim est deserunt aliqua laboris deserunt ut tempor ad pariatur et labore fugiat consectetur anim ex dolor velit labore cupidatat aliquip laboris sit duis cillum sint excepteur magna minim do mollit qui esse irure consequat ea exercitation velit cillum aliqua aute.</p> -->
+			</dialog>
+		</div>
+</body>
+</html>

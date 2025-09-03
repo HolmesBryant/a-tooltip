@@ -1,11 +1,14 @@
 a-tabset {
-	/* --bg1-color: rgb(250,250,250);
-  --bg2-color: rgb(240,240,240);
-  --bg3-color: white;
-  --text-color: rgb(40,40,40);
-  --border-color: silver;
-  --accent-color: orange;
-  --pad: .5rem; */
+	/* --bg1-color: rgb(250,250,250); */
+  /* --bg2-color: rgb(240,240,240); */
+  /* --bg3-color: white; */
+  /* --text-color: rgb(40,40,40); */
+  /* --border-color: silver; */
+  /* --accent-color: orange; */
+  /* --pad: .5rem; */
+  /* --transition: .25s; */
+  /* --height: 100%; */
+
 
   /* justify has no effect if .a-tabset-tab has flex:1 */
   --justify: start;
@@ -14,7 +17,6 @@ a-tabset {
     border: 1px solid var(--border-color);
     border-bottom-width: 0;
     padding: var(--pad);
-    flex: 1;
   }
 
   & .a-tabset-tab.tabset-column {
