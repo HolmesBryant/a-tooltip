@@ -190,7 +190,6 @@ body * {
 		flex-wrap: wrap;
 		gap: var(--gap);
 		justify-content: space-around;
-		overflow: auto;
 	}
 
 	.flex1

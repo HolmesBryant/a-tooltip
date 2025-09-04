@@ -30,15 +30,14 @@ export default class ABind extends HTMLElement {
 		if (this.object) {
 			this.abortController = new AbortController();
 			this.elem = this.children[0];
-			if (!this.elem.id) {
-				console.error(this.elem, `${this.elem.localName} element must have an id`);
+			if (!this.elem) {
+				console.error('a-bind must have one child which is an HTML element', this);
 				return;
 			}
 			const model = await this.getModel(this.object);
-			const id = this.elem.id.replace('-', '_');
 			this.addElemListener(model, this.property, this.event, this.attribute, this.elem);
 			this.setElemAttr(model, this.property, this.attribute, this.elem);
-			window[`abind_${id}`] = this.abind.bind(this);
+			window.abind = ABind;
 		}
 	}
 
@@ -51,16 +50,26 @@ export default class ABind extends HTMLElement {
 		this[attr] = newval;
 	}
 
-	abind(value) {
-		this.elem[this.attribute] = value;
+	static fire(prop, value) {
+		const evt = new CustomEvent(
+			'abind',
+			{ detail: {prop:prop, value:value}}
+		);
+
+		document.dispatchEvent(evt);
 	}
 
-	addElemListener(model, property, event, attribute, elem) {
+	addElemListener(object, property, event, attribute, elem) {
 		elem.addEventListener(event, () => {
-			if (model[property] !== elem[attribute]) {
-				model[property] = elem[attribute];
+			if (object[property] !== elem[attribute]) {
+				object[property] = elem[attribute];
 			}
 		}, {signal:this.abortController.signal, passive:true});
+
+		document.addEventListener('abind', event => {
+			if (this.p !== event.detail.prop) return;
+			this.elem[this.attribute] = event.detail.value;
+		});
 	}
 
 	async getModel(objName, wait = 1) {

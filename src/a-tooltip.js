@@ -1,11 +1,11 @@
 export default class ATooltip extends HTMLElement {
 
-	#active = true;
+	#active = false;
 
 	/**
 	 * 'default' or 'click'
 	 */
-	#activate = 'default';
+	#activate = 'click';
 
 	/**
 	 * 'center', 'inline' or modal'
@@ -30,8 +30,9 @@ export default class ATooltip extends HTMLElement {
 				--symbol-background: dodgerblue;
 				--accent-color: orange;
 				--border-color: silver;
-				--message-width: 400px;
-				display: inline;
+				--message-size: 300px;
+				--pad: .5rem;
+				display: inline-block;
 				min-height: var(--symbol-size);
 			}
 
@@ -48,9 +49,7 @@ export default class ATooltip extends HTMLElement {
 				line-height: 0;
 				outline: none;
 				width: var(--symbol-size);
-
 			}
-
 
 			button:focus,
 			button:hover {
@@ -67,6 +66,7 @@ export default class ATooltip extends HTMLElement {
 				border-radius: 5px;
 				box-shadow: 2px 2px 5px black;
 				padding: 0;
+				width: clamp(100px, var(--message-size), 95vw);
 			}
 
 			dialog > form {
@@ -81,20 +81,29 @@ export default class ATooltip extends HTMLElement {
 			}
 
 			#wrapper.inline {
-				display: fixed;
-				position:relative;
-				border: 1px solid purple;
+				position: relative;
 			}
 
-			.inline dialog {
+			#wrapper.inline.right-edge {
+				position: unset;
+			}
 
-				top: 0;
+			#wrapper.inline dialog {
+				left: calc(var(--symbol-size) + var(--pad));
+			}
+
+			#wrapper.inline.right-edge dialog {
+				width: unset;
+				left: calc(100vw - var(--message-size));
+				right: 10px;
 			}
 
 			#message {
+				font-size: small;
 				overflow-wrap: normal;
-				padding: 1rem;
-				max-width: var(--message-width);
+				padding: var(--pad);
+				max-height: var(--message-size);
+				overflow: auto;
 			}
 
 			#title {
@@ -107,16 +116,14 @@ export default class ATooltip extends HTMLElement {
 			}
 
 			#wrapper {
-				border: 1px solid lime;
+				width: stretch;
 			}
 
 		</style>
 
-			<button id="show" tabindex="0">
-				<slot name="symbol">?</slot>
-			</button>
 
 		<div id="wrapper">
+
 			<dialog>
 				<form method="dialog">
 					<div id="title">
@@ -129,13 +136,16 @@ export default class ATooltip extends HTMLElement {
 				</div>
 			</dialog>
 
+			<button id="show" tabindex="0">
+				<slot name="symbol">?</slot>
+			</button>
 		</div>
 	`;
 
 	constructor() {
 		super();
 		this.attachShadow({mode:'open'});
-		// this.shadowRoot.innerHTML = ATooltip.tmpl;
+		this.shadowRoot.innerHTML = ATooltip.template;
 	}
 
 	attributeChangedCallback(attr, oldval, newval) {
@@ -143,7 +153,6 @@ export default class ATooltip extends HTMLElement {
 	}
 
 	connectedCallback() {
-		this.setTemplate();
 		this.abortController = new AbortController();
 		this.wrapper = this.shadowRoot.querySelector('#wrapper');
 		this.dialog = this.shadowRoot.querySelector('dialog');
@@ -178,43 +187,56 @@ export default class ATooltip extends HTMLElement {
 				this.hideDialog();
 			}, { signal:this.abortController.signal });
 		}
+
+		this.dialog.addEventListener('close', () => {
+			this.toggleAttribute('active', false);
+		}, {signal:this.abortController.signal, passive:true});
 	}
 
 	hideDialog() {
+		if (this.active === false) return;
 		this.dialog.close();
 	}
 
-	setTemplate() {
-		let content = '';
-		const titleSlot = this.querySelector('[slot="title"]');
-		const messageSlot = this.querySelector('[slot="message"]');
-		if (titleSlot) content += titleSlot.textContent;
-		if (messageSlot) content += messageSlot.textContent;
-		const template = ATooltip.template.replace('{content}', `${content}`);
-		// console.log(template);
-		// return;
-		this.shadowRoot.innerHTML = template;
-		// const template = document.createRange().createContextualFragment(ATooltip.template);
-		// this.shadowRoot.append(template);
-		console.log(content, template.textContent);
-	}
-
 	showDialog() {
+		if (this.active === true) return;
+		if (this.wrapper) {
+			this.wrapper.classList.remove('inline');
+			this.wrapper.classList.remove('right-edge');
+		}
 		switch(this.position) {
 		case 'modal':
 			this.dialog.showModal();
 			break;
 		case 'inline':
-			this.wrapper.classList.add('inline');
+			if (!this.wrapper) {
+				// if showDialog was called from a setter
+				customElements.whenDefined('a-tooltip')
+				.then(() => this.showDialog());
+			} else {
+				const rect = this.wrapper.getBoundingClientRect();
+				const distanceToRight = window.innerWidth - (rect.right + window.pageXOffset) - 20;
+				const computedStyles = window.getComputedStyle(this.wrapper);
+				const messageSize = computedStyles.getPropertyValue('--message-size').trim();
+				this.wrapper.classList.add('inline');
+				if (distanceToRight < parseFloat(messageSize)) {
+					this.wrapper.classList.add('right-edge');
+				}
+				this.dialog.show();
+			}
+			break;
 		default:
 			this.dialog.show();
 		}
+
+		this.toggleAttribute('active', true);
 	}
 
 	get active() { return this.#active }
 	set active(value) {
-		value = !(value === 'false' || value === false);
+		value = !(value === 'false' || value === false || value === null);
 		if (this.#active !== value) {
+			abind.fire('active', value);
 			this.#active = value;
 			if (!this.#active) {
 				this.hideDialog();
@@ -227,6 +249,7 @@ export default class ATooltip extends HTMLElement {
 	get activate() { return this.#activate }
 	set activate(value) {
 		if (this.#activate !== value) {
+			abind.fire('activate', value);
 			this.#activate = value;
 			this.abortController.abort();
 			this.abortController = new AbortController();
@@ -239,9 +262,9 @@ export default class ATooltip extends HTMLElement {
 		if (this.#position !== value) {
 			this.#position = value;
 		}
+		abind.fire('position', value);
 	}
-
-}
+} // class
 
 document.addEventListener('DOMContentLoaded', () => {
 	if (!customElements.get('a-tooltip')) customElements.define('a-tooltip', ATooltip);
