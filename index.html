@@ -25,7 +25,7 @@
 	<h2>Demo</h2>
 	<section class="flex space-around">
 
-		<a-tabset active="2">
+		<a-tabset>
 			<strong slot="title">Attributes</strong>
 			<div slot="content">
 					<div class="flex">
@@ -35,16 +35,6 @@
 								<select id="active-attr" size="2">
 									<option>true</option>
 									<option>false</option>
-								</select>
-							</a-bind>
-						</div>
-
-						<div class="flex column">
-							<label for="activate-attr">activate</label>
-							<a-bind o="a-tooltip" p="activate">
-								<select id="activate-attr" size="2">
-									<option>default</option>
-									<option>click</option>
 								</select>
 							</a-bind>
 						</div>
@@ -76,7 +66,7 @@
 
 						<div class="flex row-reverse space-between">
 							<label for="css-border-color">--border-color</label>
-							<a-bind o="a-tooltip#demo" p="--border-color">
+							<a-bind o="#demo" p="--border-color">
 								<input type="color" id="css-border-color">
 							</a-bind>
 						</div>
@@ -98,15 +88,15 @@
 						<div class="flex gap3">
 							<div class="flex column">
 								<label for="css-symbol-size">--icon-size</label>
-								<a-bind o="a-tooltip#demo" p="--icon-size">
+								<a-bind o="#demo" p="--icon-size">
 									<input id="css-symbol-size">
 								</a-bind>
 							</div>
 
 							<div class="flex column">
-								<label for="css-message-width">--message-width</label>
-								<a-bind o="#demo" p="--message-width">
-									<input id="css-message-width">
+								<label for="css-message-size">--message-size</label>
+								<a-bind o="#demo" p="--message-size">
+									<input id="css-message-wise">
 								</a-bind>
 							</div>
 						</div>
@@ -133,14 +123,6 @@
 	</section>
 
 	<section>
-		<p>Active:
-			<a-bind o="a-tooltip" p="active" a="textContent">
-				<span>foo</span>
-			</a-bind>
-		</p>
-		<p style="color: rgb(240 200 200)">
-Reprehenderit ut consectetur non qui nostrud duis duis consequat nisi ut amet esse excepteur aliquip mollit eiusmod sunt cillum dolore dolore commodo dolore do consectetur officia do dolore esse duis nulla sunt labore culpa in ad sint labore qui qui magna pariatur anim laboris dolore ut dolore anim esse in est magna exercitation ex mollit veniam ut fugiat culpa id cupidatat adipisicing labore incididunt qui amet magna cupidatat nostrud id excepteur voluptate velit exercitation duis non dolore anim cillum do nulla ut veniam enim reprehenderit mollit occaecat laboris irure aliquip exercitation in ut deserunt id ex eiusmod esse id eu sunt ut officia ut ut aute et velit deserunt eu incididunt et cupidatat nostrud non deserunt in veniam tempor ad enim in sed ut velit incididunt elit voluptate ea exercitation eu culpa in consequat do velit in mollit dolor dolor pariatur id mollit nulla veniam dolor consequat ad commodo esse duis magna sint excepteur culpa magna ad cupidatat in aute cillum irure laborum elit est amet eu dolor cillum voluptate elit in minim laborum qui pariatur sit sed sit ad duis veniam esse exercitation eu adipisicing et id enim duis est consequat excepteur qui fugiat adipisicing incididunt et ut ut aliquip ut irure tempor do occaecat non laboris et dolor cupidatat ullamco ea voluptate sed tempor cillum mollit enim cillum irure ut cillum anim do incididunt ut sunt mollit voluptate cupidatat consectetur id deserunt fugiat nulla cupidatat amet enim laboris pariatur pariatur aliquip.
-				</p>
-	</section>
+
 </body>
 </html>

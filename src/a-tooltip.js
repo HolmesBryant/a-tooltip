@@ -3,11 +3,6 @@ export default class ATooltip extends HTMLElement {
 	#active = false;
 
 	/**
-	 * 'default' or 'click'
-	 */
-	#activate = 'click';
-
-	/**
 	 * 'center', 'inline' or modal'
 	 */
 	#position = 'modal';
@@ -159,7 +154,6 @@ export default class ATooltip extends HTMLElement {
 		this.wrapper = this.shadowRoot.querySelector('#wrapper');
 		this.dialog = this.shadowRoot.querySelector('dialog');
 		this.showBtn = this.shadowRoot.querySelector('#show');
-		// this.setCssProperties();
 		this.addListeners();
 		if (this.active) this.showDialog();
 	}
@@ -173,23 +167,9 @@ export default class ATooltip extends HTMLElement {
 	 * Check out the popover api
 	 */
 	addListeners() {
-		switch (this.activate) {
-		case 'click':
-			this.showBtn.addEventListener('click', () => {
-				this.showDialog();
-			}, { signal:this.abortController.signal });
-			break;
-		default:
-			this.showBtn.addEventListener('click', () => {
-				this.showDialog();
-			}, { signal:this.abortController.signal });
-			this.showBtn.addEventListener('mouseenter', () => {
-				this.showDialog();
-			}, { signal:this.abortController.signal });
-			this.showBtn.addEventListener('mouseleave', () => {
-				this.hideDialog();
-			}, { signal:this.abortController.signal });
-		}
+		this.showBtn.addEventListener('click', () => {
+			this.showDialog();
+		}, { signal:this.abortController.signal });
 
 		this.dialog.addEventListener('close', () => {
 			this.toggleAttribute('active', false);
@@ -197,32 +177,10 @@ export default class ATooltip extends HTMLElement {
 	}
 
 	hideDialog() {
-		if (this.active === false) return;
 		this.dialog.close();
 	}
 
-	/*setCssProperties() {
-		const props = [
-			"accentColor",
-			"borderColor",
-			"messageSize",
-			"iconBackground",
-			"iconColor",
-			"iconSize",
-			"pad",
-		];
-
-		for (const prop of props) {
-			const cssProp = '--' + prop.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-			const elemStyles = getComputedStyle(this);
-			const exists = elemStyles.getPropertyValue(cssProp);
-			if (!exists) this.style.setProperty(`${cssProp}`, this[prop]);
-			if (exists) this[prop] = exists;
-		}
-	}*/
-
 	showDialog() {
-		if (this.active === true) return;
 		if (this.wrapper) {
 			this.wrapper.classList.remove('inline');
 			this.wrapper.classList.remove('right-edge');
@@ -269,17 +227,6 @@ export default class ATooltip extends HTMLElement {
 		}
 	}
 
-	get activate() { return this.#activate }
-	set activate(value) {
-		if (this.#activate !== value) {
-			abind.fire('activate', value);
-			this.#activate = value;
-			this.abortController.abort();
-			this.abortController = new AbortController();
-			this.addListeners();
-		}
-	}
-
 	get position() { return this.#position }
 	set position(value) {
 		if (this.#position !== value) {
@@ -288,47 +235,6 @@ export default class ATooltip extends HTMLElement {
 		abind.fire('position', value);
 	}
 
-	/*get accentColor () { return this.#accentColor }
-	set accentColor(value) {
-		this.#accentColor = value;
-		// abind.fire('accentColor', value);
-	}*/
-
-	/*get borderColor() { return this.#borderColor }
-	set borderColor(value) {
-		this.#borderColor = value;
-		// abind.fire('borderColor', value);
-	}*/
-
-	/*get messageSize() { return this.#messageSize }
-	set messageSize(value) {
-		this.#messageSize = value;
-		// abind.fire('messageSize', value);
-	}*/
-
-	/*get pad () { return this.#pad }
-	set pad(value) {
-		this.#pad = value;
-		// abind.fire('pad', value);
-	}*/
-
-	/*get iconBackground() { return this.#iconBackground }
-	set iconBackground(value) {
-		this.#iconBackground = value;
-		// abind.fire('iconBackground', value);
-	}*/
-
-	/*get iconColor() { return this.#iconColor }
-	set iconColor(value) {
-		this.#iconColor = value;
-		abind.fire('iconColor', value);
-	}*/
-
-	/*get iconSize() { return this.#iconSize }
-	set iconSize(value) {
-		this.#iconSize = value;
-		// abind.fire('iconSize', value);
-	}*/
 } // class
 
 document.addEventListener('DOMContentLoaded', () => {

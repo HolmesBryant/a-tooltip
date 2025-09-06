@@ -61,6 +61,9 @@ export default class ABind extends HTMLElement {
 	}
 
 	addElemListener(object, property, event, attribute, elem) {
+		if (!property in object && !property.startsWith('--')) {
+			return console.error(`${Object.prototype.toString.call(object)} does not have property ${property}`);
+		}
 		elem.addEventListener(event, () => {
 			if (object[property] !== elem[attribute]) {
 				object[property] = elem[attribute];
