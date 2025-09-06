@@ -22,10 +22,6 @@ body {
 	padding: var(--pad);
 }
 
-body * {
-	box-sizing: border-box;
-}
-
 @media (prefers-color-scheme: dark) {
 	body {
     --bg1-color: rgb(20, 20, 20);
@@ -119,9 +115,11 @@ body * {
 	{ cursor: pointer; }
 
 /**** Structure ****/
-	button {
-		padding: .5rem;
-	}
+	body *
+	{ box-sizing: border-box; }
+
+	button
+	{ padding: .5rem; }
 
 	details
 	{ overflow: auto; }

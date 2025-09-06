@@ -4,9 +4,9 @@ export default class ABind extends HTMLElement {
 	#p;
 	#property;
 	#e;
-	#event;
+	#event = 'change';
 	#a;
-	#attribute;
+	#attribute = 'value';
 
 	abortController;
 	elem;
@@ -38,6 +38,7 @@ export default class ABind extends HTMLElement {
 			this.addElemListener(model, this.property, this.event, this.attribute, this.elem);
 			this.setElemAttr(model, this.property, this.attribute, this.elem);
 			window.abind = ABind;
+			// console.log(this.property)
 		}
 	}
 
@@ -73,34 +74,72 @@ export default class ABind extends HTMLElement {
 	}
 
 	async getModel(objName, wait = 1) {
+		let name, id = '';
+		if (objName.startsWith('#')) {
+			const [n, selector] = objName.split('#');
+			name = n;
+			id = `#${selector}`;
+		} else {
+			name = objName;
+		}
+
     return new Promise((resolve) => {
       const timeoutId = setTimeout(() => {
 	      console.error(`Timeout: ${objName} is not defined or available to window`);
 	      resolve(null);
       }, wait * 1000);
 
-      if (window[objName]) {
+      if (window[name]) {
 	      clearTimeout(timeoutId);
-      	resolve(window[objName]);
-      } else if (customElements.get(objName)) {
+      	resolve(window[name]);
+      } else if (customElements.get(name)) {
 	      clearTimeout(timeoutId);
-	      resolve(document.querySelector(objName));
+	      resolve(document.querySelector(name + id));
+	    } else if (id) {
+	    	clearTimeout(timeoutId);
+	    	resolve(document.querySelector(id));
       } else {
-	      customElements.whenDefined(objName).then(() => {
+	      customElements.whenDefined(name).then(() => {
 	        clearTimeout(timeoutId);
-	        resolve(document.querySelector(objName));
+	        resolve(document.querySelector(name + id));
 	      }).catch((error) => {
 	        clearTimeout(timeoutId);
-	        console.error(error.message);
+	        console.error(`${error.message} : ${name} ${id}`);
 	        resolve(null);
 	      });
       }
     });
 	}
 
-	setElemAttr(model, property, attribute, elem) {
-		if (model[property] !== elem[attribute]) {
-			elem[attribute] = model[property];
+	convertColor(value) {
+		if (value === null || value === undefined) return console.error(`The color value for ${this.property} on ${this.object} is ${value}`);
+		// convertColorValueToHex() is a function in "a-bind-color-conversion.js" script file.
+		// Remember to include the script in your page if you are using <input type="color">
+		return convertColorValueToHex ? convertColorValueToHex(value) : value;
+	}
+
+	setElemAttr(obj, property, attribute, elem) {
+		let value;
+		if (property.startsWith('--') && obj instanceof HTMLElement) {
+			// its a css custom property;
+			const styles = getComputedStyle(obj);
+			value = styles.getPropertyValue(property);
+		} else {
+			value = obj[property];
+		}
+
+		const modelName = (obj instanceof HTMLElement) ? obj.localName : Object.prototype.toString.call(obj);
+		if (value === null || value === undefined) {
+			return console.error(`${property} is not a property of ${modelName}`, elem);
+		}
+
+		if (value !== elem[attribute]) {
+			switch (elem.type) {
+				case "color":
+					value = this.convertColor(value);
+				default:
+					elem[attribute] = value;
+			}
 		}
 	}
 

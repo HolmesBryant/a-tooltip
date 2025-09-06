@@ -10,7 +10,7 @@ export default class ATooltip extends HTMLElement {
 	/**
 	 * 'center', 'inline' or modal'
 	 */
-	#position = 'inline';
+	#position = 'modal';
 
 	abortController;
 
@@ -25,30 +25,30 @@ export default class ATooltip extends HTMLElement {
 	static template = `
 		<style>
 			:host {
-				--symbol-size: 35px;
-				--symbol-color: white;
-				--symbol-background: dodgerblue;
-				--accent-color: orange;
+				--accent-color:orange;
 				--border-color: silver;
 				--message-size: 300px;
+				--icon-background: dodgerblue;
+				--icon-color: white;
+				--icon-size: 35px;
 				--pad: .5rem;
 				display: inline-block;
-				min-height: var(--symbol-size);
+				min-height: var(--icon-size);
 			}
 
 			button {
-				background-color: var(--symbol-background);
+				background-color: var(--icon-background);
 				border: 1px solid var(--border-color);
 				border-radius: 50%;
 				box-sizing: border-box;
-				color: var(--symbol-color);
+				color: var(--icon-color);
 				cursor: pointer;
-				font-size: calc( var(--symbol-size) * .98 );
+				font-size: calc( var(--icon-size) * .98 );
 				font-weight: bold;
-				height: var(--symbol-size);
+				height: var(--icon-size);
 				line-height: 0;
 				outline: none;
-				width: var(--symbol-size);
+				width: var(--icon-size);
 			}
 
 			button:focus,
@@ -89,7 +89,7 @@ export default class ATooltip extends HTMLElement {
 			}
 
 			#wrapper.inline dialog {
-				left: calc(var(--symbol-size) + var(--pad));
+				left: calc(var(--icon-size) + var(--pad));
 			}
 
 			#wrapper.inline.right-edge dialog {
@@ -149,7 +149,9 @@ export default class ATooltip extends HTMLElement {
 	}
 
 	attributeChangedCallback(attr, oldval, newval) {
-		this[attr] = newval;
+		// Convert kebab-case attribute name to camelCase property name
+    attr = attr.replace(/-(.)/g, (match, letter) => letter.toUpperCase());
+    this[attr] = newval;
 	}
 
 	connectedCallback() {
@@ -157,6 +159,7 @@ export default class ATooltip extends HTMLElement {
 		this.wrapper = this.shadowRoot.querySelector('#wrapper');
 		this.dialog = this.shadowRoot.querySelector('dialog');
 		this.showBtn = this.shadowRoot.querySelector('#show');
+		// this.setCssProperties();
 		this.addListeners();
 		if (this.active) this.showDialog();
 	}
@@ -197,6 +200,26 @@ export default class ATooltip extends HTMLElement {
 		if (this.active === false) return;
 		this.dialog.close();
 	}
+
+	/*setCssProperties() {
+		const props = [
+			"accentColor",
+			"borderColor",
+			"messageSize",
+			"iconBackground",
+			"iconColor",
+			"iconSize",
+			"pad",
+		];
+
+		for (const prop of props) {
+			const cssProp = '--' + prop.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+			const elemStyles = getComputedStyle(this);
+			const exists = elemStyles.getPropertyValue(cssProp);
+			if (!exists) this.style.setProperty(`${cssProp}`, this[prop]);
+			if (exists) this[prop] = exists;
+		}
+	}*/
 
 	showDialog() {
 		if (this.active === true) return;
@@ -264,6 +287,48 @@ export default class ATooltip extends HTMLElement {
 		}
 		abind.fire('position', value);
 	}
+
+	/*get accentColor () { return this.#accentColor }
+	set accentColor(value) {
+		this.#accentColor = value;
+		// abind.fire('accentColor', value);
+	}*/
+
+	/*get borderColor() { return this.#borderColor }
+	set borderColor(value) {
+		this.#borderColor = value;
+		// abind.fire('borderColor', value);
+	}*/
+
+	/*get messageSize() { return this.#messageSize }
+	set messageSize(value) {
+		this.#messageSize = value;
+		// abind.fire('messageSize', value);
+	}*/
+
+	/*get pad () { return this.#pad }
+	set pad(value) {
+		this.#pad = value;
+		// abind.fire('pad', value);
+	}*/
+
+	/*get iconBackground() { return this.#iconBackground }
+	set iconBackground(value) {
+		this.#iconBackground = value;
+		// abind.fire('iconBackground', value);
+	}*/
+
+	/*get iconColor() { return this.#iconColor }
+	set iconColor(value) {
+		this.#iconColor = value;
+		abind.fire('iconColor', value);
+	}*/
+
+	/*get iconSize() { return this.#iconSize }
+	set iconSize(value) {
+		this.#iconSize = value;
+		// abind.fire('iconSize', value);
+	}*/
 } // class
 
 document.addEventListener('DOMContentLoaded', () => {
