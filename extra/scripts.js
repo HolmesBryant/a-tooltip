@@ -1,23 +1,10 @@
 
-/*
- * Change attributes on demo elements.
+/**
+ * Resets the value of an input to ''
  */
-function change(elem, attr) {
-	let value = elem.value;
-	const demos = document.querySelectorAll('wijit-code.demo');
-
-	switch (attr) {
-	case "inline":
-		value = (elem.checked) ? 'true' : 'false';
-		break;
-	case "highlight":
-		if (elem.value === 'reset') location.reload();
-		break;
-	}
-
-	for (const demo of demos) {
-		demo.setAttribute(attr, value);
-	}
+function resetInput(inputId) {
+	const elem = document.getElementById(inputId);
+	elem.value = '';
 }
 
 /**

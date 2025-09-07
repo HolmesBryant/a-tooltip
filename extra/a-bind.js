@@ -10,6 +10,7 @@ export default class ABind extends HTMLElement {
 
 	abortController;
 	elem;
+	model;
 
 	static observedAttributes = [
 		'o',
@@ -34,9 +35,15 @@ export default class ABind extends HTMLElement {
 				console.error('a-bind must have one child which is an HTML element', this);
 				return;
 			}
-			const model = await this.getModel(this.object);
-			this.addElemListener(model, this.property, this.event, this.attribute, this.elem);
-			this.setElemAttr(model, this.property, this.attribute, this.elem);
+			this.model = await this.getModel(this.object);
+
+			if (!this.model) {
+				console.error(this);
+				throw new Error(`The object described by ${this.object} is ${model}`);
+			}
+
+			this.addElemListener(this.model, this.property, this.event, this.attribute, this.elem);
+			this.setElemAttr(this.model, this.property, this.attribute, this.elem);
 			window.abind = ABind;
 			// console.log(this.property)
 		}
@@ -51,10 +58,10 @@ export default class ABind extends HTMLElement {
 		this[attr] = newval;
 	}
 
-	static fire(prop, value) {
+	static fire(obj, prop, value) {
 		const evt = new CustomEvent(
 			'abind',
-			{ detail: {prop:prop, value:value}}
+			{ detail: {obj:obj, prop:prop, value:value}}
 		);
 
 		document.dispatchEvent(evt);
@@ -64,16 +71,26 @@ export default class ABind extends HTMLElement {
 		if (!property in object && !property.startsWith('--')) {
 			return console.error(`${Object.prototype.toString.call(object)} does not have property ${property}`);
 		}
+
 		elem.addEventListener(event, () => {
-			if (object[property] !== elem[attribute]) {
-				object[property] = elem[attribute];
+			if (this.property.startsWith('--')) {
+				if (elem[attribute] === "") {
+					this.model.style.removeProperty(property);
+				} else {
+					this.model.style.setProperty(property, elem[attribute]);
+				}
+			} else {
+				if (object[property] !== elem[attribute]) {
+					object[property] = elem[attribute];
+				}
 			}
 		}, {signal:this.abortController.signal, passive:true});
 
 		document.addEventListener('abind', event => {
-			if (this.p !== event.detail.prop) return;
+			if (this.model !== event.detail.obj) return;
+			if (this.property !== event.detail.prop) return;
 			this.elem[this.attribute] = event.detail.value;
-		});
+		}, {signal:this.abortController.signal});
 	}
 
 	async getModel(objName, wait = 1) {

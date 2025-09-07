@@ -22,7 +22,7 @@ export default class ATooltip extends HTMLElement {
    * @private
    * @type {string}
    */
-	#position = 'modal';
+	#position = 'inline';
 
 	/**
 	 * AbortController for removing event listeners when element is removed from the DOM
@@ -44,6 +44,13 @@ export default class ATooltip extends HTMLElement {
 	 * @type {HTMLDialogElement}
 	 */
 	dialog;
+
+	/**
+	 * The HTML button element in the dialog which closes the dialog.
+	 *
+	 * @type {HTMLButtonElement}
+	 */
+	closeBtn;
 
 	/**
 	 * The HTML button element which is clicked to show the tooltip message.
@@ -113,6 +120,10 @@ export default class ATooltip extends HTMLElement {
 				width: clamp(100px, var(--message-size), 95vw);
 			}
 
+			dialog::backdrop {
+				background: rgba(0,0,0,0.5);
+			}
+
 			dialog > form {
 				display: flex;
 				justify-content: space-between;
@@ -170,21 +181,28 @@ export default class ATooltip extends HTMLElement {
 					<div id="title">
 						<slot name="title"></slot>
 					</div>
-					<button>×</button>
+					<button id="close">×</button>
 				</form>
 				<div id="message">
-					<slot name="message">...</slot>
+					<slot>...</slot>
 				</div>
 			</dialog>
 
 			<button id="show" tabindex="0">
-				<slot name="symbol">?</slot>
+				<slot name="icon">?</slot>
 			</button>
 		</div>
 	`;
 
 	/**
 	 * Creates an instance of ATooltip
+	 *
+	 * @test mock
+	 		const elem = document.createElement('a-tooltip');
+	 		elem.id = 'test-elem';
+	 		document.body.append(elem);
+	 		a.mod = document.querySelector(`#${elem.id}`);
+	 		//console.log(a.mod) \\
 	 */
 	constructor() {
 		super();
@@ -208,17 +226,16 @@ export default class ATooltip extends HTMLElement {
 	/**
    * Called when the element is inserted into the DOM.
    *
-   * @test mock
-   		a.mod = document.createElement('a-tooltip');
-			mod.connectedCallback() \\
-		* @test mod.abortController instanceof AbortController \\ true
-		* @test mod.wrapper instanceof HTMLElement \\ true
-		* @test mod.showBtn instanceof HTMLButtonElement \\ true
+	 * @test mod.abortController instanceof AbortController \\ true
+	 * @test mod.wrapper instanceof HTMLElement \\ true
+	 * @test mod.closeBtn instanceof HTMLButtonElement \\ true
+	 * @test mod.showBtn instanceof HTMLButtonElement \\ true
    */
 	connectedCallback() {
 		this.abortController = new AbortController();
 		this.wrapper = this.shadowRoot.querySelector('#wrapper');
 		this.dialog = this.shadowRoot.querySelector('dialog');
+		this.closeBtn = this.shadowRoot.querySelector('#close');
 		this.showBtn = this.shadowRoot.querySelector('#show');
 		this.addListeners();
 		if (this.active) this.showDialog();
@@ -235,8 +252,9 @@ export default class ATooltip extends HTMLElement {
 	/**
    * Adds event listeners for tooltip functionality.
    *
-   * @test mod.showBtn.click(); return mon.dialog.hasAttribute('open') \\ true
-   * @test mod.closeBtn.click(); return mod.active; \\ false
+   * @test mod.showBtn.click(); return mod.dialog.open \\ true
+   * @test mock mod.closeBtn.click() \\
+   * @test a.when(() => mod.active === true) \\ true
    */
 	addListeners() {
 		this.showBtn.addEventListener('click', () => {
@@ -250,7 +268,7 @@ export default class ATooltip extends HTMLElement {
 
 	/**
    * Hides the tooltip dialog.
-   * @test mock if (!mod.dialog.hasAttribute('open')) mod.dialog.open() \\
+   * @test mock if (!mod.dialog.hasAttribute('open')) mod.dialog.show() \\
    * @test mod.hideDialog(); return mod.dialog.hasAttribute('open') \\ false
    */
 	hideDialog() {
@@ -262,21 +280,24 @@ export default class ATooltip extends HTMLElement {
    *
    * @test mock mod.position = 'modal'; \\
    * @test info " position is 'modal' " \\
-   * @test mod.showDialog(); return mod.dialog.open === '' \\ false
+   * @test mod.showDialog(); return mod.dialog.open \\ true
    * @test mock mod.hideDialog(); mod.position = 'center' \\
    *
    * @test info " positon is 'center' " \\
-   * @test mod.showDialog(); return mod.dialog.open === '' \\ true
-   * @test mock mod.hideDialog(); mod.position = 'inline';
-   *
+   * @test mod.showDialog(); return mod.dialog.open \\ true
+   * @test mock mod.hideDialog(); mod.position = 'inline' \\
+
    * @test info " position is 'inline' " \\
    * @test
-   			const mywrapper = mod.dialog.querySelector('#wrapper');
-				const rect = mywrapper.getBoundingClientRect();
-				const viewportWidth = window.innerWidth;
-				return rect.right > viewportWidth \\ false
-   *
-   * @test mock mod.position = 'modal'; mod.hideDialog() \\
+   		const mywrapper = mod.shadowRoot.querySelector('#wrapper');
+			const rect = mywrapper.getBoundingClientRect();
+			const viewportWidth = window.innerWidth;
+			return rect.right > viewportWidth \\ false
+
+   * @test mock
+   		mod.setAttribute('position', 'modal');
+   		mod.hideDialog(); \\
+   * @test a.when(() => mod.active === false) \\ true
    */
 	showDialog() {
 		if (this.wrapper) {
@@ -316,7 +337,7 @@ export default class ATooltip extends HTMLElement {
    *
    * @returns {boolean}
    *
-   * @test mod.active \\ false
+   * @test a.when(() => mod.active === false) \\ true
    */
 	get active() { return this.#active }
 
@@ -332,13 +353,14 @@ export default class ATooltip extends HTMLElement {
 	set active(value) {
 		value = !(value === 'false' || value === false || value === null);
 		if (this.#active !== value) {
-			abind.fire('active', value);
 			this.#active = value;
 			if (!this.#active) {
 				this.hideDialog();
 			} else {
 				this.showDialog();
 			}
+
+			if (window.abind) abind.fire(this, 'active', value);
 		}
 	}
 
@@ -360,9 +382,14 @@ export default class ATooltip extends HTMLElement {
 	set position(value) {
 		if (this.#position !== value) {
 			this.#position = value;
+			if (window.abind) abind.fire(this, 'position', value);
 		}
-		abind.fire('position', value);
 	}
+
+	/**
+	 * @test mock mod.remove() \\
+	 * @test this.abortController \\ undefined
+	 */
 } // class
 
 document.addEventListener('DOMContentLoaded', () => {

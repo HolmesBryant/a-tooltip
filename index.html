@@ -27,31 +27,31 @@
 	<h2>Demo</h2>
 	<section class="flex space-around">
 
-		<a-tabset>
+		<a-tabset active="2">
 			<strong slot="title">Attributes</strong>
 			<div slot="content">
-					<div class="flex">
-						<div class="flex column">
-							<label for="active-attr">active</label>
-							<a-bind o="a-tooltip" p="active">
-								<select id="active-attr" size="2">
-									<option>true</option>
-									<option>false</option>
-								</select>
-							</a-bind>
-						</div>
-
-						<div class="flex column">
-							<label for="position-attr">Position</label>
-							<a-bind o="a-tooltip" p="position">
-								<select id="position-attr" size="3">
-									<option selected>inline</option>
-									<option>center</option>
-									<option>modal</option>
-								</select>
-							</a-bind>
-						</div>
+				<div class="flex">
+					<div class="flex column">
+						<label for="active-attr">active</label>
+						<a-bind o="#demo" p="active">
+							<select id="active-attr" size="2">
+								<option>true</option>
+								<option>false</option>
+							</select>
+						</a-bind>
 					</div>
+
+					<div class="flex column">
+						<label for="position-attr">Position</label>
+						<a-bind o="#demo" p="position">
+							<select id="position-attr" size="3">
+								<option selected>inline</option>
+								<option>center</option>
+								<option>modal</option>
+							</select>
+						</a-bind>
+					</div>
+				</div>
 			</div>
 
 			<strong slot="title">
@@ -59,11 +59,19 @@
 			</strong>
 
 			<div slot="content" class="flex column start">
-						<div class="flex row-reverse space-between">
-							<label for="css-accent-color">--accent-color</label>
-							<a-bind o="a-tooltip" p="--accent-color">
+						<div class="flex space-between">
+							<label for="css-accent-color">
+
+							--accent-color</label>
+							<a-bind
+								o="a-tooltip"
+								p="--accent-color"
+								e="change"
+								a="value">
 								<input type="color" id="css-accent-color">
 							</a-bind>
+
+							<button onclick="resetInput('css-accent-color')">Reset</button>
 						</div>
 
 						<div class="flex row-reverse space-between">
@@ -105,7 +113,7 @@
 			</div>
 		</a-tabset>
 
-		<div class="flex">
+		<div id="demo-input" class="flex">
 			<div class="flex column start">
 				<label>A Label</label>
 
@@ -113,11 +121,8 @@
 					<input value="some value">
 
 					<a-tooltip id="demo">
-						<b slot="symbol">!</b>
-						<h3 slot="title">Tooltip</h3>
-						<div slot="message">
-							Reprehenderit ut consectetur non qui nostrud
-						</div>
+						<b slot="title">Tooltip Title</b>
+						This is the tooptip message.
 					</a-tooltip>
 				</div>
 			</div>
@@ -125,7 +130,16 @@
 	</section>
 
 	<section>
-		<test-runner file="src/a-tooltip.js"></test-runner>
+		<p>
+			Position:
+			<a-bind o="#demo" p="position" a="textContent">
+				<span>...</span>
+			</a-bind>
+		</p>
+	</section>
+
+	<section>
+		<test-runner all file="src/a-tooltip.js"></test-runner>
 	</section>
 
 </body>
