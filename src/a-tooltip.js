@@ -1,22 +1,71 @@
+/**
+ * ATooltip class that extends HTMLElement to create a tooltip component.
+ *
+ * @class ATooltip
+ * @extends {HTMLElement}
+ * @author Holmes Bryant <https://github.com/HolmesBryant>
+ * @license GPL-3.0
+ */
 export default class ATooltip extends HTMLElement {
 
+	/**
+	 * Whether the tooltip dialog is open (true) or closed (false)
+	 *
+	 * @private
+	 * @type {boolean}
+	 */
 	#active = false;
 
 	/**
-	 * 'center', 'inline' or modal'
-	 */
+	 *Tooltip position, can be 'center', 'inline' or 'modal'.
+   *
+   * @private
+   * @type {string}
+   */
 	#position = 'modal';
 
+	/**
+	 * AbortController for removing event listeners when element is removed from the DOM
+	 *
+	 * @type {AbortController}
+	 */
 	abortController;
 
+	/**
+	 * An html element which wraps the "open" button and the dialog
+	 *
+	 * @type {HTMLElement}
+	 */
 	wrapper;
 
+	/**
+	 * The HTML dialog element in which the tooltip message is displayed.
+	 *
+	 * @type {HTMLDialogElement}
+	 */
 	dialog;
 
+	/**
+	 * The HTML button element which is clicked to show the tooltip message.
+	 *
+	 * @type {HTMLButtonElement}
+	 */
 	showBtn;
 
+	/**
+	 * List of observed attributes.
+	 *
+	 * @static
+	 * @type {Array<string>}
+	 */
 	static observedAttributes = ['position', 'activate', 'active'];
 
+	/**
+   * Template containing styles and HTML structure for the tooltip component.
+   *
+   * @static
+   * @type {string}
+   */
 	static template = `
 		<style>
 			:host {
@@ -113,12 +162,9 @@ export default class ATooltip extends HTMLElement {
 			#wrapper {
 				width: stretch;
 			}
-
 		</style>
 
-
 		<div id="wrapper">
-
 			<dialog>
 				<form method="dialog">
 					<div id="title">
@@ -137,18 +183,38 @@ export default class ATooltip extends HTMLElement {
 		</div>
 	`;
 
+	/**
+	 * Creates an instance of ATooltip
+	 */
 	constructor() {
 		super();
 		this.attachShadow({mode:'open'});
 		this.shadowRoot.innerHTML = ATooltip.template;
 	}
 
+	/**
+   * Called when an attribute is changed, added, or removed.
+   *
+   * @param {string} attr - The name of the attribute.
+   * @param {any} oldval - The old value of the attribute.
+   * @param {any} newval - The new value of the attribute.
+   */
 	attributeChangedCallback(attr, oldval, newval) {
 		// Convert kebab-case attribute name to camelCase property name
     attr = attr.replace(/-(.)/g, (match, letter) => letter.toUpperCase());
     this[attr] = newval;
 	}
 
+	/**
+   * Called when the element is inserted into the DOM.
+   *
+   * @test mock
+   		a.mod = document.createElement('a-tooltip');
+			mod.connectedCallback() \\
+		* @test mod.abortController instanceof AbortController \\ true
+		* @test mod.wrapper instanceof HTMLElement \\ true
+		* @test mod.showBtn instanceof HTMLButtonElement \\ true
+   */
 	connectedCallback() {
 		this.abortController = new AbortController();
 		this.wrapper = this.shadowRoot.querySelector('#wrapper');
@@ -158,14 +224,20 @@ export default class ATooltip extends HTMLElement {
 		if (this.active) this.showDialog();
 	}
 
+	/**
+	 * Called when the element is removed from the DOM
+	 */
 	disconnectedCallback() {
 		this.abortController.abort();
 		this.abortController = null;
 	}
 
 	/**
-	 * Check out the popover api
-	 */
+   * Adds event listeners for tooltip functionality.
+   *
+   * @test mod.showBtn.click(); return mon.dialog.hasAttribute('open') \\ true
+   * @test mod.closeBtn.click(); return mod.active; \\ false
+   */
 	addListeners() {
 		this.showBtn.addEventListener('click', () => {
 			this.showDialog();
@@ -176,10 +248,36 @@ export default class ATooltip extends HTMLElement {
 		}, {signal:this.abortController.signal, passive:true});
 	}
 
+	/**
+   * Hides the tooltip dialog.
+   * @test mock if (!mod.dialog.hasAttribute('open')) mod.dialog.open() \\
+   * @test mod.hideDialog(); return mod.dialog.hasAttribute('open') \\ false
+   */
 	hideDialog() {
 		this.dialog.close();
 	}
 
+	/**
+   * Shows the tooltip dialog based on its position.
+   *
+   * @test mock mod.position = 'modal'; \\
+   * @test info " position is 'modal' " \\
+   * @test mod.showDialog(); return mod.dialog.open === '' \\ false
+   * @test mock mod.hideDialog(); mod.position = 'center' \\
+   *
+   * @test info " positon is 'center' " \\
+   * @test mod.showDialog(); return mod.dialog.open === '' \\ true
+   * @test mock mod.hideDialog(); mod.position = 'inline';
+   *
+   * @test info " position is 'inline' " \\
+   * @test
+   			const mywrapper = mod.dialog.querySelector('#wrapper');
+				const rect = mywrapper.getBoundingClientRect();
+				const viewportWidth = window.innerWidth;
+				return rect.right > viewportWidth \\ false
+   *
+   * @test mock mod.position = 'modal'; mod.hideDialog() \\
+   */
 	showDialog() {
 		if (this.wrapper) {
 			this.wrapper.classList.remove('inline');
@@ -191,7 +289,7 @@ export default class ATooltip extends HTMLElement {
 			break;
 		case 'inline':
 			if (!this.wrapper) {
-				// if showDialog was called from a setter
+				// showDialog was probably called from a setter, which runs before connectedCallback()
 				customElements.whenDefined('a-tooltip')
 				.then(() => this.showDialog());
 			} else {
@@ -213,7 +311,24 @@ export default class ATooltip extends HTMLElement {
 		this.toggleAttribute('active', true);
 	}
 
+	/**
+   * Getter for the active state of the tooltip.
+   *
+   * @returns {boolean}
+   *
+   * @test mod.active \\ false
+   */
 	get active() { return this.#active }
+
+	/**
+   * Setter for the active state of the tooltip.
+   * Toggles the active state and shows or hides the dialog accordingly.
+   *
+   * @param {any} value - The new value for the active state, always resolves to a boolean.
+   *
+   * @test mod.active = true; return mod.dialog.hasAttribute('open') \\ true
+   * @test mod.active = false; return mod.dialog.hasAttribute('open') \\ false
+   */
 	set active(value) {
 		value = !(value === 'false' || value === false || value === null);
 		if (this.#active !== value) {
@@ -227,14 +342,27 @@ export default class ATooltip extends HTMLElement {
 		}
 	}
 
+	/**
+   * Getter for the position of the tooltip.
+   *
+   * @returns {string}
+   *
+   * @test mod.position \\ 'modal'
+   */
 	get position() { return this.#position }
+
+	/**
+   * Setter for the position of the tooltip.
+   * Updates the position and fires an event if the value changes.
+   *
+   * @param {"inline" | "center" | "modal"} value - The new value for the position.
+   */
 	set position(value) {
 		if (this.#position !== value) {
 			this.#position = value;
 		}
 		abind.fire('position', value);
 	}
-
 } // class
 
 document.addEventListener('DOMContentLoaded', () => {
