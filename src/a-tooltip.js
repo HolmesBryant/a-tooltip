@@ -78,6 +78,7 @@ export default class ATooltip extends HTMLElement {
 			:host {
 				--accent-color:orange;
 				--border-color: silver;
+				--border-radius: 50%;
 				--message-size: 300px;
 				--icon-background: dodgerblue;
 				--icon-color: white;
@@ -88,9 +89,9 @@ export default class ATooltip extends HTMLElement {
 			}
 
 			button {
-				background-color: var(--icon-background);
+				background: var(--icon-background);
 				border: 1px solid var(--border-color);
-				border-radius: 50%;
+				border-radius: var(--border-radius);
 				box-sizing: border-box;
 				color: var(--icon-color);
 				cursor: pointer;
@@ -99,7 +100,17 @@ export default class ATooltip extends HTMLElement {
 				height: var(--icon-size);
 				line-height: 0;
 				outline: none;
+				overflow: clip;
 				width: var(--icon-size);
+			}
+
+			::slotted(img) {
+				max-width: 100%;
+				object-fit: cover;
+			}
+
+			::slotted(svg) {
+				fill: var(--icon-color);
 			}
 
 			button:focus,
@@ -253,8 +264,9 @@ export default class ATooltip extends HTMLElement {
    * Adds event listeners for tooltip functionality.
    *
    * @test mod.showBtn.click(); return mod.dialog.open \\ true
-   * @test mock mod.closeBtn.click() \\
    * @test a.when(() => mod.active === true) \\ true
+   * @test mock mod.closeBtn.click() \\
+   * @test a.when(() => mod.active === false) \\ true
    */
 	addListeners() {
 		this.showBtn.addEventListener('click', () => {
@@ -268,10 +280,11 @@ export default class ATooltip extends HTMLElement {
 
 	/**
    * Hides the tooltip dialog.
-   * @test mock if (!mod.dialog.hasAttribute('open')) mod.dialog.show() \\
-   * @test mod.hideDialog(); return mod.dialog.hasAttribute('open') \\ false
+   * @test mock mod.showDialog() \\
+   * @test mod.hideDialog(); return mod.dialog.open \\ false
    */
 	hideDialog() {
+		delete this.dialog.dataset.method;
 		this.dialog.close();
 	}
 
@@ -279,15 +292,15 @@ export default class ATooltip extends HTMLElement {
    * Shows the tooltip dialog based on its position.
    *
    * @test mock mod.position = 'modal'; \\
-   * @test info " position is 'modal' " \\
-   * @test mod.showDialog(); return mod.dialog.open \\ true
+   * @test info "Make sure dialog was opened with showModal()" \\
+   * @test mod.showDialog(); return mod.dialog.dataset.method \\ "showModal"
    * @test mock mod.hideDialog(); mod.position = 'center' \\
    *
-   * @test info " positon is 'center' " \\
-   * @test mod.showDialog(); return mod.dialog.open \\ true
+   * @test info "Make sure dialog was opened with show()" \\
+   * @test mod.showDialog(); return mod.dialog.dataset.method \\ "show"
    * @test mock mod.hideDialog(); mod.position = 'inline' \\
 
-   * @test info " position is 'inline' " \\
+   * @test info "Make sure dialog is positioned so that its right edge doesn't run off the screen" \\
    * @test
    		const mywrapper = mod.shadowRoot.querySelector('#wrapper');
 			const rect = mywrapper.getBoundingClientRect();
@@ -295,7 +308,7 @@ export default class ATooltip extends HTMLElement {
 			return rect.right > viewportWidth \\ false
 
    * @test mock
-   		mod.setAttribute('position', 'modal');
+   		mod.removeAttribute('position');
    		mod.hideDialog(); \\
    * @test a.when(() => mod.active === false) \\ true
    */
@@ -306,6 +319,7 @@ export default class ATooltip extends HTMLElement {
 		}
 		switch(this.position) {
 		case 'modal':
+			this.dialog.dataset.method = 'showModal';
 			this.dialog.showModal();
 			break;
 		case 'inline':
@@ -326,6 +340,7 @@ export default class ATooltip extends HTMLElement {
 			}
 			break;
 		default:
+			this.dialog.dataset.method = 'show';
 			this.dialog.show();
 		}
 
@@ -337,7 +352,7 @@ export default class ATooltip extends HTMLElement {
    *
    * @returns {boolean}
    *
-   * @test a.when(() => mod.active === false) \\ true
+   * @test mod.active \\ false
    */
 	get active() { return this.#active }
 
@@ -347,8 +362,8 @@ export default class ATooltip extends HTMLElement {
    *
    * @param {any} value - The new value for the active state, always resolves to a boolean.
    *
-   * @test mod.active = true; return mod.dialog.hasAttribute('open') \\ true
-   * @test mod.active = false; return mod.dialog.hasAttribute('open') \\ false
+   * @test mod.active = true; return mod.dialog.open \\ true
+   * @test mod.active = false; return mod.dialog.open \\ false
    */
 	set active(value) {
 		value = !(value === 'false' || value === false || value === null);
@@ -369,7 +384,7 @@ export default class ATooltip extends HTMLElement {
    *
    * @returns {string}
    *
-   * @test mod.position \\ 'modal'
+   * @test mod.position \\ 'inline'
    */
 	get position() { return this.#position }
 

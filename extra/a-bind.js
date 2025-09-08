@@ -75,7 +75,9 @@ export default class ABind extends HTMLElement {
 		elem.addEventListener(event, (event) => {
 			if (this.property.startsWith('--')) {
 				// this.property is likely a css variable (custom property)
-				if (event.detail.value === "") {
+				if (elem[attribute] === "" || elem[attribute] === "#000000") {
+					// when you reset a <input type="color"> or set its value to "",
+					// the browser sets the value to #000000.
 					this.model.style.removeProperty(property);
 					const styles = getComputedStyle(this.model);
 					const propValue = styles.getPropertyValue(this.property);
@@ -99,7 +101,7 @@ export default class ABind extends HTMLElement {
 			if (this.model !== event.detail.obj) return;
 			if (this.property !== event.detail.prop) return;
 			this.elem[this.attribute] = event.detail.value;
-		}, {signal:this.abortController.signal});
+		}, { passive: true });
 	}
 
 	async getModel(objName, wait = 1) {

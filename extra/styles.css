@@ -27,6 +27,7 @@ body {
     --bg1-color: rgb(20, 20, 20);
 		--bg2-color: rgb(40,40,40);
 		--bg3-color: rgb(60, 60, 60);
+		--bg4-color:  rgb(240,240,240);
 		--accent-color: orange;
 		--border-color: dimgray;
 		--text-color: rgb(240, 240, 240);
@@ -41,23 +42,27 @@ body {
 
 	section,
   summary
-  { background-color: var(--bg2-color) }
+  { background: var(--bg2-color) }
 
-	button
-	{ background-color: var(--bg3-color) }
+	button,
+	.card
+	{ background: var(--bg3-color) }
+
+	button.primary
+	{ background: var(--accent-color); }
 
 	input,
 	select
-	{ background-color: var(--bg4-color); }
+	{ background: var(--bg4-color); }
 
   button:hover,
   summary:hover,
   details[open] > summary,
   option:checked
-  { background-color: var(--accent-color) }
+  { background: var(--accent-color) }
 
   button:active {
-  	background-color: initial;
+  	background: initial;
   }
 
 /**** Borders ****/
@@ -67,7 +72,8 @@ body {
 	details,
 	input,
 	select,
-	option
+	option,
+	.card
 	{ border: 1px solid var(--border-color); }
 
   article,
@@ -75,11 +81,9 @@ body {
   input,
   section,
   select,
-  summary
+  summary,
+  .card
   { border-radius: .5rem; }
-
-  wijit-tabs button
-  { border-radius: .5rem .5rem 0 0 }
 
 /**** Text ****/
 
@@ -89,10 +93,8 @@ body {
 	button
 	{ color: var(--text-color) }
 
-	button.active-tab {
-		font-size: larger;
-		font-weight: bold;
-	}
+	button.primary
+	{ color: var(--accent-text); }
 
 	input,
 	select,
@@ -112,6 +114,13 @@ body {
 
 /**** Cursor ****/
 	button,
+	input[type="submit"],
+	input[type="button"],
+	input[type="color"],
+	input[type="radio"],
+	input[type="checkbox"],
+	option,
+	select,
 	summary
 	{ cursor: pointer; }
 
@@ -151,6 +160,10 @@ body {
 		min-width: var(--min);
 	}
 
+	input:not([type="color"]),
+	option
+	{ padding: var(--pad); }
+
 	label
 	{ display: inline-block; }
 
@@ -182,6 +195,10 @@ body {
 
 	ul, ol
 	{ margin: 0; }
+
+	.card {
+		padding:  var(--pad);
+	}
 
 	/* FLEX */
 
