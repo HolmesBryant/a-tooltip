@@ -94,7 +94,7 @@ export default class ATooltip extends HTMLElement {
 				box-sizing: border-box;
 				color: var(--icon-color);
 				cursor: pointer;
-				font-size: calc( var(--icon-size) * .98 );
+				font-size: calc( var(--icon-size) * .99 );
 				font-weight: bold;
 				height: var(--icon-size);
 				line-height: 0;

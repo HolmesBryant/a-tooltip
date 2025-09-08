@@ -5,6 +5,16 @@
 function resetInput(inputId) {
 	const elem = document.getElementById(inputId);
 	elem.value = '';
+	const inputEvent = new InputEvent('input', { bubbles: true });
+    try {
+      elem.dispatchEvent(inputEvent);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "InvalidStateError") {
+        console.log("Event dispatching was blocked due to an ongoing event.");
+      } else {
+        console.error(error);
+      }
+    }
 }
 
 /**

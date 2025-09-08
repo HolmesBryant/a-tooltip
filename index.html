@@ -58,47 +58,65 @@
 				CSS Properties
 			</strong>
 
-			<div slot="content" class="flex column start">
-						<div class="flex space-between">
+			<div slot="content" class="">
+						<div class="grid row3 center">
 							<label for="css-accent-color">
 
 							--accent-color</label>
 							<a-bind
 								o="a-tooltip"
-								p="--accent-color"
-								e="change"
-								a="value">
+								p="--accent-color">
 								<input type="color" id="css-accent-color">
 							</a-bind>
 
 							<button onclick="resetInput('css-accent-color')">Reset</button>
 						</div>
 
-						<div class="flex row-reverse space-between">
+						<div class="grid row3 center">
 							<label for="css-border-color">--border-color</label>
-							<a-bind o="#demo" p="--border-color">
+
+							<a-bind
+								o="#demo"
+								p="--border-color">
 								<input type="color" id="css-border-color">
 							</a-bind>
+
+							<button onclick="resetInput('css-border-color')">Reset</button>
 						</div>
 
-						<div class="flex row-reverse space-between">
-							<label for="css-symbol-color">--icon-color</label>
-							<a-bind o="a-tooltip" p="--icon-color">
-								<input type="color" id="css-symbol-color">
+						<div class="grid row3 center">
+							<label for="css-icon-color">--icon-color</label>
+
+							<a-bind
+								o="a-tooltip"
+								p="--icon-color">
+								<input type="color" id="css-icon-color">
 							</a-bind>
+
+							<button onclick="resetInput('css-icon-color')">Reset</button>
 						</div>
 
-						<div class="flex row-reverse space-between">
-							<label for="css-symbol-background">--icon-background</label>
-							<a-bind o="a-tooltip" p="--icon-background">
-								<input type="color" id="css-symbol-background">
+						<div class="grid row3 center">
+							<label for="css-icon-background">--icon-background</label>
+
+							<a-bind
+								o="a-tooltip"
+								p="--icon-background">
+								<input type="color" id="css-icon-background">
 							</a-bind>
+
+							<button onclick="resetInput('css-icon-background')">Reset</button>
 						</div>
 
-						<div class="flex gap3">
+						<hr>
+
+						<div class="flex">
 							<div class="flex column">
 								<label for="css-symbol-size">--icon-size</label>
-								<a-bind o="#demo" p="--icon-size">
+								<a-bind
+									o="#demo"
+									p="--icon-size"
+									e="change">
 									<input id="css-symbol-size">
 								</a-bind>
 							</div>
@@ -110,6 +128,7 @@
 								</a-bind>
 							</div>
 						</div>
+
 			</div>
 		</a-tabset>
 

@@ -4,7 +4,7 @@ export default class ABind extends HTMLElement {
 	#p;
 	#property;
 	#e;
-	#event = 'change';
+	#event = 'input';
 	#a;
 	#attribute = 'value';
 
@@ -72,10 +72,18 @@ export default class ABind extends HTMLElement {
 			return console.error(`${Object.prototype.toString.call(object)} does not have property ${property}`);
 		}
 
-		elem.addEventListener(event, () => {
+		elem.addEventListener(event, (event) => {
 			if (this.property.startsWith('--')) {
-				if (elem[attribute] === "") {
+				// this.property is likely a css variable (custom property)
+				if (event.detail.value === "") {
 					this.model.style.removeProperty(property);
+					const styles = getComputedStyle(this.model);
+					const propValue = styles.getPropertyValue(this.property);
+					if (elem.type === "color") {
+						elem[attribute] = this.convertColor(propValue);
+					} else {
+						elem[attribute] = propValue;
+					}
 				} else {
 					this.model.style.setProperty(property, elem[attribute]);
 				}
@@ -84,7 +92,8 @@ export default class ABind extends HTMLElement {
 					object[property] = elem[attribute];
 				}
 			}
-		}, {signal:this.abortController.signal, passive:true});
+
+		}, {signal:this.abortController.signal, bubbles:true});
 
 		document.addEventListener('abind', event => {
 			if (this.model !== event.detail.obj) return;

@@ -62,6 +62,7 @@ body {
 
 /**** Borders ****/
 
+	hr,
 	button,
 	details,
 	input,
@@ -182,6 +183,8 @@ body {
 	ul, ol
 	{ margin: 0; }
 
+	/* FLEX */
+
 	.flex {
 		align-items: center;
 		display: flex;
@@ -223,6 +226,12 @@ body {
 	.column.start
 	{ align-items: start; }
 
+	.stretch
+	{ justify-content: stretch; }
+
+	.column.stretch
+	{ align-items: stretch; }
+
 	.space-between
 	{ justify-content: space-between; }
 
@@ -242,6 +251,17 @@ body {
 	.wrap {
 		flex-wrap: wrap;
 	}
+
+	/* GRID */
+
+	.grid
+	{ display: grid; }
+
+	.row3
+	{ grid-template-columns: 1fr 1fr 1fr; }
+
+	.row3.center
+	{ justify-items: center; }
 
 	.sticky {
 		position: sticky;
