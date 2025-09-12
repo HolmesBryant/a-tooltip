@@ -4,17 +4,18 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>A-Tooltip Web Component</title>
-	<script type="module" src="src/a-tooltip.js"></script>
+	<script type="module" src="dist/a-tooltip.min.js"></script>
 	<script type="module" src="extra/a-tabset.js"></script>
 	<script type="module" src="extra/a-bind.js"></script>
-	<script type="module" src="extra/a-code.min.js"></script>
-	<script type="module" src="extra/ATestRunner.js"></script>
+	<script type="module" src="extra/a-code.js"></script>
+	<!-- <script type="module" src="extra/ATestRunner.js"></script> -->
 
 	<script defer src="extra/a-bind-color-conversion.js"></script>
 	<script defer src="extra/scripts.js"></script>
 
 	<link rel="stylesheet" href="extra/styles.css">
 	<link rel="stylesheet" href="extra/a-tabset.css">
+	<link rel="stylesheet" href="extra/a-tooltip.css">
 </head>
 <body>
 	<h1>A-Tooltip Web Component</h1>
@@ -130,7 +131,6 @@
 								</a-bind>
 							</div>
 						</div>
-
 			</div>
 		</a-tabset>
 
@@ -142,8 +142,8 @@
 					<input value="some value">
 
 					<a-tooltip id="demo">
-						<b slot="title">Tooltip Title</b>
-						This is the tooptip message.
+						<b hidden slot="title">Tooltip Title</b>
+						<span hidden>This is the tooptip message.</span>
 					</a-tooltip>
 				</div>
 			</div>
@@ -152,69 +152,204 @@
 
 	<h2>Examples</h2>
 
-	<section class="flex">
-		<div>
-			<header>
-				<h3>Using an svg element as the icon</h3>
+	<section class="flex stretch">
+		<div class="card flex1">
+			<header class="flex start">
+				<a-tooltip>
+					<b slot="title">Tooltip Title</b>
+					The tooltip message
+				</a-tooltip>
+				<h3> Tooltip with title and message </h3>
 			</header>
 
-			<div class="flex">
-				<div class="card flex1">
-					<strong>
-						<a-code style="display:inline-block">
-							<img src="star.svg">
-						</a-code>
-					</strong>
-
+			<a-code highlight>
+				<textarea>
 					<a-tooltip>
-						<img slot="icon" src="extra/star.svg">
+						<b slot="title">Tooltip Title</b>
+						The tooltip message
+					</a-tooltip>
+				</textarea>
+			</a-code>
+		</div>
+
+		<div class="card flex1">
+			<header class="flex start">
+				<a-tooltip>
+					<span slot="title">A tooltip message.</span>
+				</a-tooltip>
+				<h3> Tooltip with only a title </h3>
+			</header>
+
+			<a-code highlight>
+				<textarea>
+					<a-tooltip>
+						<span slot="title">A tooltip message.</span>
+					</a-tooltip>
+				</textarea>
+			</a-code>
+		</div>
+
+		<div class="card flex1">
+			<header class="flex start">
+				<a-tooltip>
+					A tooltip message.
+				</a-tooltip>
+				<h3> Tooltip with only a message </h3>
+			</header>
+
+			<a-code highlight>
+				<textarea>
+					<a-tooltip>
+						A tooltip message.
+					</a-tooltip>
+				</textarea>
+			</a-code>
+		</div>
+
+		<div class="card flex1">
+			<header class="flex start">
+				<a-tooltip>
+					<span slot="icon">!</span>
+					The tooltip message.
+				</a-tooltip>
+
+				<h3> Tooltip with custom icon </h3>
+			</header>
+
+			<a-code highlight>
+				<textarea>
+					<a-tooltip>
+						<span slot="icon">!</span>
+						The tooltip message.
+					</a-tooltip>
+				</textarea>
+			</a-code>
+		</div>
+	</section>
+
+	<section>
+		<header>
+			<h3>Using an svg element as the icon</h3>
+		</header>
+
+		<div class="flex stretch">
+			<div class="card flex1">
+				<p>
+					<a-tooltip>
+						<img hidden slot="icon" src="extra/star.svg">
 						The tooltip message.
 					</a-tooltip>
 
-					<a-code highlight>
+					<strong>&ltimg src="star.svg"&gt</strong>
+					 (svg fill ignores --icon-color)
+				</p>
+
+				<a-code highlight>
+					<textarea>
 						<a-tooltip>
 							<img slot="icon" src="star.svg">
 							The tooltip message.
 						</a-tooltip>
-					</a-code>
-				</div>
+					</textarea>
+				</a-code>
+			</div>
 
-				<div class="card flex1">
-					<strong>
-						<a-code style="display:inline-block">
-							<svg>...</svg>
-						</a-code>
-					</strong>
-
+			<div class="card flex1">
+				<p>
 					<a-tooltip>
-						<svg slot="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc. --><path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/></svg>
+						<svg slot="icon" display="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc. --><path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/></svg>
 						The tooltip message
 					</a-tooltip>
 
-					<a-code highlight>
-						<a-tooltip>
-							<svg slot="icon" xmlns="http://www.w3.org/2000/svg">
-								...
-							</svg>
-							The tooltip message.
-						</a-tooltip>
-					</a-code>
-				</div>
+					<strong> &ltsvg>...&lt/svg> </strong>
+					 (svg fill inherits --icon color)
+				</p>
+
+				<a-code highlight>
+					<a-tooltip>
+						<svg slot="icon"> ... </svg>
+						<span>The message.</span>
+					</a-tooltip>
+				</a-code>
 			</div>
 		</div>
 	</section>
 
 	<section>
-		<div class="card">
-			<header>
-				<strong>Using an image as the icon</strong>
-			</header>
+		<header>
+			<h3>Using a square image as the icon and including an image in the message</h3>
+		</header>
 
-			<a-tooltip style="--icon-size:50px; --border-radius:0; --icon-background:transparent; --border-color:transparent">
-				<img slot="icon" src="extra/metope_bull_thumb.jpg">
-				The tooltip message.
+		<div class="card">
+			<a-tooltip
+				position = "modal"
+				style="
+					--icon-size:100px;
+					--border-radius:0;
+					--icon-background:transparent;
+					--border-color:transparent;
+					--cursor:help;
+					--message-size: auto;
+					">
+				<img hidden slot="icon" src="extra/metope_bull_thumb.jpg">
+				<strong slot="title"><em>Taming of the Bull</em> from the <em>Labors of Heracles</em></strong>
+				<figure hidden>
+					<img src="extra/metope_bull.jpg">
+					<figcaption>
+						Reconstruction of the <em>Taming of the Bull</em> metope on the ancient Temple of Zeus in Olympia Greece.
+					</figcaption>
+				</figure>
 			</a-tooltip>
+
+			<a-code highlight>
+				<textarea>
+					<a-tooltip
+						position = "modal"
+						style = "
+							--icon-size:100px;
+							--border-radius:0;
+							--icon-background:transparent;
+							--border-color:transparent;
+							--cursor: help;
+							--message-size: auto;
+							">
+						<img slot="icon" src="thumb.jpg">
+						<strong slot="title"> ... </strong>
+						<figure>
+							<img src="image.jpg">
+							<figcaption> ... </figcaption>
+						</figure>
+					</a-tooltip>
+				</textarea>
+			</a-code>
 		</div>
+	</section>
+
+	<section>
+		<header>
+			<h3> Mitigating FUC! (Flash of Unstyled Content) </h3>
+			<p> Add the attribute <code>display = "none"</code> for slotted svg elements and add the attribute <code>hidden</code> to slotted HTML elements.
+		</header>
+
+		<div class="card">
+			<a-tooltip>
+				<svg slot="icon" display="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+					<path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>
+				</svg>
+				<strong hidden slot="title">Tooltip Title</strong>
+				<div hidden>The tooltip message</div>
+			</a-tooltip>
+
+			<a-code highlight>
+					<textarea>
+						<a-tooltip>
+							<svg display="none" slot="icon"> ... </svg>
+							<b hidden slot="title"> title </b>
+							<div hidden> message </div>
+						</a-tooltip>
+					</textarea>
+				</a-code>
+			</div>
 	</section>
 
 	<section>

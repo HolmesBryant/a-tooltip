@@ -79,6 +79,7 @@ export default class ATooltip extends HTMLElement {
 				--accent-color:orange;
 				--border-color: silver;
 				--border-radius: 50%;
+				--cursor: pointer;
 				--message-size: 300px;
 				--icon-background: dodgerblue;
 				--icon-color: white;
@@ -88,29 +89,35 @@ export default class ATooltip extends HTMLElement {
 				min-height: var(--icon-size);
 			}
 
+			@keyframes fadeIn {
+			  from { opacity: 0; }
+			  to { opacity: 1; }
+			}
+
 			button {
 				background: var(--icon-background);
 				border: 1px solid var(--border-color);
 				border-radius: var(--border-radius);
 				box-sizing: border-box;
 				color: var(--icon-color);
-				cursor: pointer;
-				font-size: calc( var(--icon-size) * .99 );
 				font-weight: bold;
-				height: var(--icon-size);
 				line-height: 0;
 				outline: none;
 				overflow: clip;
+			}
+
+			button#show {
+				cursor: var(--cursor);
+				font-size: calc( var(--icon-size) * .99 );
+				height: var(--icon-size);
 				width: var(--icon-size);
 			}
 
-			::slotted(img) {
-				max-width: 100%;
-				object-fit: cover;
-			}
-
-			::slotted(svg) {
-				fill: var(--icon-color);
+			button#close {
+				cursor: pointer;
+				font-size: 34px;
+				height: 35px;
+				width: 35px;
 			}
 
 			button:focus,
@@ -119,17 +126,19 @@ export default class ATooltip extends HTMLElement {
 				box-shadow: 1px 1px 2px gray;
 			}
 
-			button:active {
-				box-shadow: inset 1px 1px 2px gray;
-			}
+			button:active
+			{ box-shadow: inset 1px 1px 2px gray; }
 
 			dialog {
 				border: 1px solid var(--border-color);
 				border-radius: 5px;
 				box-shadow: 2px 2px 5px black;
 				padding: 0;
-				width: clamp(100px, var(--message-size), 95vw);
 			}
+
+			dialog[open],
+			dialog[open]::backdrop
+			 { animation: fadeIn .25s ease-in-out; }
 
 			dialog::backdrop {
 				background: rgba(0,0,0,0.5);
@@ -146,30 +155,32 @@ export default class ATooltip extends HTMLElement {
 				border-top-right-radius: 5px;
 			}
 
-			#wrapper.inline {
-				position: relative;
+			::slotted(h1),
+			::slotted(h2),
+			::slotted(h3),
+			::slotted(h4),
+			::slotted(h5),
+			::slotted(h6)
+			{ margin: 0}
+
+
+			::slotted(img) {
+				width: 100%;
+				object-fit: cover;
 			}
 
-			#wrapper.inline.right-edge {
-				position: unset;
-			}
-
-			#wrapper.inline dialog {
-				left: calc(var(--icon-size) + var(--pad));
-			}
-
-			#wrapper.inline.right-edge dialog {
-				width: unset;
-				left: calc(100vw - var(--message-size));
-				right: 10px;
+			::slotted(svg) {
+				fill: var(--icon-color);
+				width: 100%;
 			}
 
 			#message {
 				font-size: small;
 				overflow-wrap: normal;
 				padding: var(--pad);
+				width: max-content;
 				max-height: var(--message-size);
-				overflow: auto;
+				max-width: var(--message-size);
 			}
 
 			#title {
@@ -181,25 +192,31 @@ export default class ATooltip extends HTMLElement {
 				margin: 0;
 			}
 
-			#wrapper {
-				width: stretch;
+			#wrapper { width: stretch; }
+			#wrapper.inline { position: relative; }
+			#wrapper.inline.right-edge { position: unset; }
+			#wrapper.inline dialog { left: calc(var(--icon-size) + var(--pad)); }
+			#wrapper.inline.right-edge dialog {
+				width: unset;
+				left: calc(100vw - var(--message-size));
+				right: 10px;
 			}
 		</style>
 
 		<div id="wrapper">
-			<dialog>
+			<dialog part="dialog">
 				<form method="dialog">
-					<div id="title">
+					<div id="title" part="title">
 						<slot name="title"></slot>
 					</div>
-					<button id="close">×</button>
+					<button id="close" part="close">×</button>
 				</form>
-				<div id="message">
+				<div id="message" part="message">
 					<slot>...</slot>
 				</div>
 			</dialog>
 
-			<button id="show" tabindex="0">
+			<button id="show" tabindex="0" part="icon">
 				<slot name="icon">?</slot>
 			</button>
 		</div>
@@ -249,6 +266,7 @@ export default class ATooltip extends HTMLElement {
 		this.closeBtn = this.shadowRoot.querySelector('#close');
 		this.showBtn = this.shadowRoot.querySelector('#show');
 		this.addListeners();
+		this.removeHidden();
 		if (this.active) this.showDialog();
 	}
 
@@ -286,6 +304,19 @@ export default class ATooltip extends HTMLElement {
 	hideDialog() {
 		delete this.dialog.dataset.method;
 		this.dialog.close();
+	}
+
+	/**
+	 * Removes `display` attriute slotted svg elements and `hidden` attribute from other slotted elements.
+	 */
+	removeHidden() {
+		for (const elem of this.children) {
+			if (elem.localName === 'svg') {
+				elem.toggleAttribute('display', false);
+			} else {
+				elem.toggleAttribute('hidden', false);
+			}
+		}
 	}
 
 	/**
