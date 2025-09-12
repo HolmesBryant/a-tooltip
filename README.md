@@ -8,13 +8,17 @@ Demo: [https://holmesbryant.github.io/a-tooltip/](https://holmesbryant.github.io
 - You can position the tooltip message inline, in the center of the viewport, or as a modal.
 - You can automatically show the tooltip message when the page loads via the attribute 'active'.
 - You can use your own icon (character, svg or image). This is what the user clicks on to display the message.
-- You can use css custom properties in a stylesheet, style tag or style attribute to change the accent color, border color, message size, icon background color, icon color, icon size and padding
+- You can use css custom properties in a stylesheet, style tag or style attribute to change the accent color, border color, message size, icon background color, icon color, icon size and padding.
 
 ## Usage
 
 Include the script tag in your HTML page. Include the attribute `type="module"`.
 
-    <script type="module" src="a-tooltip.min.js"></script>
+    <script type="module" src="path/to/a-tooltip.min.js"></script>
+
+Optional: Include the a-tooltip stylesheet.
+
+    <link rel="stylesheet" href="path/to/a-tooltip.css">
 
 Include the a-tooltip tag in the body with your message.
 
@@ -55,23 +59,26 @@ Add an element with the attribute `slot="icon"` if you want to change the icon a
 
 This component exposes several custom css properties which affect the appearance.
 
-    /* Example css */
+    /* Example CSS */
     a-tooltip {
-        --symbol-size: 35px;
-        --symbol-color: white;
-        --symbol-background: dodgerblue;
         --accent-color: orange;
         --border-color: silver;
-        --message-width: 400px;
+        --border-radius: 50%;
+        --cursor: pointer;
+        --message-size: 300px;
+        --icon-background: dodgerblue;
+        --icon-color: white;
+        --icon-size: 35px;
+        --pad: .5rem;
     }
 
-Note: --message-width is defined as `max-width`, so if your message is short, the dialog will shrink to the content.
+Note: --message-width is defined as `max-width` so if your message is short, the dialog will shrink to the content.
 
 ## Preventing FUC! (Flash of Unstyled Content)
 
 If you are getting a flash of unstyled content, you can mitigate this by adding an attribute to all direct children of the custom element.
 
-If the element is an inline svg, add `display="none"` to it. (**Not** `style="display:none"`).
+If the element is an inline svg, add the attribute `display="none"`. (**Not** `style="display:none"`).
 
 If the element is a normal HTML element, add the `hidden` attribute.
 
@@ -81,11 +88,11 @@ If the element is a normal HTML element, add the `hidden` attribute.
         <div hidden>The tooltip message</div>
     </a-tooltip>
 
-Once the custom element has been defined and styles applied, the attributes `hidden` and `display` will be automatically removed.
+Once the custom element has been registered and styles applied, the attributes `hidden` and `display` will be automatically removed.
 
-If you are also getting unwanted layout-shift, you can solve this using css.
+If you are also getting unwanted layout shift, you can solve this using css.
 
-    /* css stylesheet */
+    /* Example CSS */
     a-tooltip {
         --icon-size: 35px;
         width: var(--icon-size);
@@ -101,10 +108,16 @@ If you are also getting unwanted layout-shift, you can solve this using css.
         The tooltip message
     </a-tooltip>
 
-### Tooltip with only the title
+### Tooltip with only a message
 
     <a-tooltip>
-        <span slot="title">The tooltip message</span>
+        The tooltip message.
+    <a-tooltip>
+
+### Tooltip with only a title
+
+    <a-tooltip>
+        <span slot="title">...</span>
     <a-tooltip>
 
 ### Opening the tooltip message as a modal
@@ -142,20 +155,18 @@ The svg fill color **inherits** --icon-color when you include the svg directly i
 
 Normally the tooltip icon displays as a circle, but with css you can coerce it into a square.
 
-    <a-tooltip style="--border-radius:0">
+    <a-tooltip style="--border-radius: 0">
         <img slot="icon" src="square-image.jpg">
         The tooltip message
     </a-tooltip>
 
 ### Using a-tooltip as a simple lightbox
 
-    <a-tooltip position="modal">
+    <a-tooltip position = "modal">
         <img slot="icon" src="thumbnail.jpg">
         <figure>
             <img src="image.jpg">
-            <figcaption>
-                Description of the image
-            </figcaption>
+            <figcaption> ... </figcaption>
         </figure>
     </a-tooltip>
 
