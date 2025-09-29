@@ -39,7 +39,7 @@ function unstickIfNeeded (target, watched) {
 }
 
 /*
- * Convenience functionality for inputs
+ * Automatically selects the text in input elements on 'focus' and 'click'
  */
 function upgradeInputs () {
 	const inputs = document.querySelectorAll('input');
@@ -51,12 +51,6 @@ function upgradeInputs () {
 		input.addEventListener('click', event => {
 			event.target.select();
 		});
-
-		input.addEventListener('keydown', event => {
-			if (event.key === "Enter") {
-				event.target.select();
-			}
-		})
 	}
 }
 
