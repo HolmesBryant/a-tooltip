@@ -406,7 +406,7 @@ export default class ATooltip extends HTMLElement {
 				this.showDialog();
 			}
 
-			if (window.abind) abind.fire(this, 'active', value);
+			if (window.abind) abind.update(this, 'active', value);
 		}
 	}
 
@@ -428,7 +428,7 @@ export default class ATooltip extends HTMLElement {
 	set position(value) {
 		if (this.#position !== value) {
 			this.#position = value;
-			if (window.abind) abind.fire(this, 'position', value);
+			if (window.abind) abind.update(this, 'position', value);
 		}
 	}
 
