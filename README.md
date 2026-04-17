@@ -1,6 +1,6 @@
 # A-Tooltip
 
-A web component that displays a tooltip icon which, when clicked, displays message.
+A web component that displays a tooltip icon which, when clicked, displays a message.
 
 Demo: [https://holmesbryant.github.io/a-tooltip/](https://holmesbryant.github.io/a-tooltip/)
 
@@ -61,42 +61,15 @@ This component exposes several custom css properties which affect the appearance
 
     /* Example CSS */
     a-tooltip {
-        --accent-color: orange;
+        --accent-color: dodgerblue;
         --border-color: silver;
         --border-radius: 50%;
-        --cursor: pointer;
+        --cursor: help;
         --message-size: 300px;
         --icon-background: dodgerblue;
         --icon-color: white;
         --icon-size: 35px;
         --pad: .5rem;
-    }
-
-Note: --message-width is defined as `max-width` so if your message is short, the dialog will shrink to the content.
-
-## Preventing FUC! (Flash of Unstyled Content)
-
-If you are getting a flash of unstyled content, you can mitigate this by adding an attribute to all direct children of the custom element.
-
-If the element is an inline svg, add the attribute `display="none"`. (**Not** `style="display:none"`).
-
-If the element is a normal HTML element, add the `hidden` attribute.
-
-    <a-tooltip>
-        <svg slot="icon" display="none">...</svg>
-        <strong slot="title" hidden>The Title</strong>
-        <div hidden>The tooltip message</div>
-    </a-tooltip>
-
-Once the custom element has been registered and styles applied, the attributes `hidden` and `display` will be automatically removed.
-
-If you are also getting unwanted layout shift, you can solve this using css.
-
-    /* Example CSS */
-    a-tooltip {
-        --icon-size: 35px;
-        width: var(--icon-size);
-        height: var(--icon-size);
     }
 
 ## Examples

@@ -1,0 +1,141 @@
+/* @file src/a-tooltip-shadow.css */
+
+:host {
+	display: inline-block;
+
+	/* Prevents layout shift */
+	min-height: var(--icon-size, 35px);
+	min-width: var(--icon-size, 35px);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+::slotted(h1),
+::slotted(h2),
+::slotted(h3),
+::slotted(h4),
+::slotted(h5),
+::slotted(h6)
+{ margin: 0}
+
+
+::slotted(img) {
+	width: 100%;
+	object-fit: cover;
+}
+
+::slotted(*) {
+	cursor: var(--cursor, help);
+}
+
+::slotted(svg) {
+	fill: var(--icon-color, white);
+	width: 100%;
+}
+
+button {
+	align-items: center;
+	background: var(--icon-background, dodgerblue);
+	border: 1px solid var(--border-color, silver);
+	border-radius: var(--border-radius, 50%);
+	box-sizing: border-box;
+	color: var(--icon-color, white);
+	display: inline-flex;
+	font-weight: bold;
+	justify-content: center;
+	line-height: 0;
+	outline: none;
+	overflow: clip;
+}
+
+button#show {
+	cursor: var(--cursor);
+	font-size: calc( var(--icon-size, 35px) * .99 );
+	height: var(--icon-size, 35px);
+	width: var(--icon-size, 35px);
+}
+
+button#close {
+	background: var(--accent-color, dodgerblue);
+	cursor: pointer;
+	font-size: 34px;
+	height: 35px;
+	width: 35px;
+}
+
+button:focus,
+button:hover {
+	background: var(--accent-color, dodgerblue);
+	box-shadow: 1px 1px 2px gray;
+}
+
+button:active
+{ box-shadow: inset 1px 1px 2px gray; }
+
+dialog {
+	border: 1px solid var(--border-color);
+	border-radius: 5px;
+	box-shadow: 2px 2px 5px black;
+	padding: 0;
+}
+
+dialog[open],
+dialog[open]::backdrop
+ { animation: fadeIn .25s ease-in-out; }
+
+dialog::backdrop {
+	background: rgba(0,0,0,0.5);
+}
+
+dialog > form {
+	display: flex;
+	justify-content: space-between;
+}
+
+dialog > form > button {
+	border-bottom-right-radius: 0;
+	border-top-left-radius: 0;
+	border-top-right-radius: 5px;
+}
+
+.hide { display: none; }
+
+#message {
+	font-size: small;
+	overflow-wrap: normal;
+	padding: var(--pad, .5rem);
+	width: var(--message-size, max-content);
+	max-height: var(--message-size, 300px);
+	max-width: var(--message-size, 300px);
+}
+
+#title {
+	padding-top: var(--pad, .5rem);
+	padding-left: var(--pad, .5rem);
+}
+
+#text {
+	display: inline-block;
+	width: max-content;
+}
+
+#triggers {
+	align-items: center;
+	display: flex;
+	gap: .25rem;
+	width: max-content;
+}
+
+#title ::slotted(*) { margin: 0 }
+#wrapper { width: stretch; }
+#wrapper.inline { position: relative; }
+#wrapper.inline.right-edge { position: unset; }
+#wrapper.inline dialog { left: calc(var(--icon-size, 35px) + var(--pad, .5rem)); }
+#wrapper.inline.right-edge dialog {
+	width: unset;
+	left: calc(100vw - var(--message-size, 300px));
+	right: 10px;
+}

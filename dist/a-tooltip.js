@@ -1,3 +1,6 @@
+const sheet = new CSSStyleSheet();
+          sheet.replaceSync("/* @file src/a-tooltip-shadow.css */:host {display: inline-block;/* Prevents layout shift */min-height: var(--icon-size, 35px);min-width: var(--icon-size, 35px);}@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; }}::slotted(h1),::slotted(h2),::slotted(h3),::slotted(h4),::slotted(h5),::slotted(h6){ margin: 0}::slotted(img) {width: 100%;object-fit: cover;}::slotted(label) {cursor: var(--cursor, help);}::slotted(svg) {fill: var(--icon-color, white);width: 100%;}button {align-items: center;background: var(--icon-background, dodgerblue);border: 1px solid var(--border-color, silver);border-radius: var(--border-radius, 50%);box-sizing: border-box;color: var(--icon-color, white);display: inline-flex;font-weight: bold;justify-content: center;line-height: 0;outline: none;overflow: clip;}button#show {cursor: var(--cursor);font-size: calc( var(--icon-size, 35px) * .99 );height: var(--icon-size, 35px);width: var(--icon-size, 35px);}button#close {cursor: pointer;font-size: 34px;height: 35px;width: 35px;}button:focus,button:hover {background-color: var(--accent-color, dodgerblue);box-shadow: 1px 1px 2px gray;}button:active{ box-shadow: inset 1px 1px 2px gray; }dialog {border: 1px solid var(--border-color);border-radius: 5px;box-shadow: 2px 2px 5px black;padding: 0;}dialog[open],dialog[open]::backdrop { animation: fadeIn .25s ease-in-out; }dialog::backdrop {background: rgba(0,0,0,0.5);}dialog > form {display: flex;justify-content: space-between;}dialog > form > button {border-bottom-right-radius: 0;border-top-left-radius: 0;border-top-right-radius: 5px;}#message {font-size: small;overflow-wrap: normal;padding: var(--pad, .5rem);width: max-content;max-height: var(--message-size, 300px);max-width: var(--message-size, 300px);}#title {padding-top: var(--pad, .5rem);padding-left: var(--pad, .5rem);}#text {display: inline-block;width: max-content;}#triggers {align-items: center;display: flex;gap: .25rem;width: max-content;}#title ::slotted(*) { margin: 0 }#wrapper { width: stretch; }#wrapper.inline { position: relative; }#wrapper.inline.right-edge { position: unset; }#wrapper.inline dialog { left: calc(var(--icon-size, 35px) + var(--pad, .5rem)); }#wrapper.inline.right-edge dialog {width: unset;left: calc(100vw - var(--message-size, 300px));right: 10px;}");
+
 /**
  * ATooltip class that extends HTMLElement to create a tooltip component.
  *
@@ -9,7 +12,6 @@
  * @version 1.5
  */
 
-import styles from './a-tooltip-shadow.css' with {type: 'css'};
 
 /**
  * Symbol used for integrating with abind data binding library.
@@ -18,7 +20,7 @@ import styles from './a-tooltip-shadow.css' with {type: 'css'};
  */
 const abindUpdate = Symbol.for('abind.update');
 
-export default class ATooltip extends HTMLElement {
+class ATooltip extends HTMLElement {
 
 	// --- attributes --
 
@@ -29,13 +31,6 @@ export default class ATooltip extends HTMLElement {
 	 * @type {boolean}
 	 */
 	#active = false;
-
-	/**
-	 * Whether the icon is omitted
-	 *
-	 * @private
-	 */
-	#noicon = false;
 
 	/**
 	 *Tooltip position, can be 'center', 'inline' or 'modal'.
@@ -62,19 +57,6 @@ export default class ATooltip extends HTMLElement {
 	 * @type {HTMLButtonElement}
 	 */
 	#buttonTrigger;
-
-	/**
-	 * determine if connectedCallback() has run
-	 * @private
-	 */
-	#connected = false;
-
-	/**
-	 * HTML element which wraps the icon slot
-	 *
-	 * @private
-	 */
-	#icon;
 
 	#messageSize;
 
@@ -109,7 +91,7 @@ export default class ATooltip extends HTMLElement {
 	#textTrigger;
 
 	/**
-	 * html element which wraps the "open" button and the #tooltip
+	 * An html element which wraps the "open" button and the #tooltip
 	 *
 	 * @private
 	 * @type {HTMLElement}
@@ -122,7 +104,7 @@ export default class ATooltip extends HTMLElement {
 	 * @static
 	 * @type {Array<string>}
 	 */
-	static observedAttributes = ['position', 'noicon','active'];
+	static observedAttributes = ['position', 'active'];
 
 
 	/**
@@ -158,7 +140,7 @@ export default class ATooltip extends HTMLElement {
 					</button>
 				</div>
 			</div>
-		`
+		`;
 	};
 
 	/**
@@ -175,13 +157,12 @@ export default class ATooltip extends HTMLElement {
 		super();
 		this.attachShadow({mode:'open'});
 		this.shadowRoot.append(ATooltip.template.content.cloneNode(true));
-		this.shadowRoot.adoptedStyleSheets = [styles];
+		this.shadowRoot.adoptedStyleSheets = [sheet];
 		this.#wrapper = this.shadowRoot.querySelector('#wrapper');
 		this.#tooltip = this.shadowRoot.querySelector('dialog');
 		this.#buttonTrigger = this.shadowRoot.querySelector('#show');
 		this.#textTrigger = this.shadowRoot.querySelector('#text');
 		this.#textSlot = this.shadowRoot.querySelector('slot[name="tiptext"]');
-		this.#icon = this.shadowRoot.querySelector('#show');
 	}
 
 	// -- Lifecycle --
@@ -198,7 +179,6 @@ export default class ATooltip extends HTMLElement {
 		switch (attr) {
 		case 'active':
 			this.#active = this.hasAttribute('active');
-			if (!this.#connected) return;
 			if (!this.#active) {
 				this.#hideDialog();
 			} else {
@@ -206,19 +186,8 @@ export default class ATooltip extends HTMLElement {
 			}
 			globalThis[abindUpdate]?.(this, attr, this.#active);
 			break;
-		case 'noicon':
-			this.#noicon = this.hasAttribute('noicon');
-			if (this.#noicon) {
-				this.#icon.classList.add('hide');
-			} else {
-				this.#icon.classList.remove('hide');
-			}
-			globalThis[abindUpdate]?.(this, attr, this.#noicon);
-			break;
 		case 'position':
 			this.#position = newval;
-			if (!this.#connected) return;
-			if (this.active) this.#reset();
 			globalThis[abindUpdate]?.(this, attr, newval);
 			break;
 		}
@@ -241,16 +210,7 @@ export default class ATooltip extends HTMLElement {
 		const computedStyles = window.getComputedStyle(this.#wrapper);
 		this.#messageSize = computedStyles.getPropertyValue('--message-size').trim();
 		this.#addListeners();
-
-		if (this.active) {
-			requestAnimationFrame(() => {
-			  requestAnimationFrame(() => {
-			    this.#showDialog();
-			  });
-			});
-		}
-
-		this.#connected = true;
+		if (this.active) this.#showDialog();
 	}
 
 	/**
@@ -278,7 +238,7 @@ export default class ATooltip extends HTMLElement {
 	#addListeners() {
 	  this.#buttonTrigger.addEventListener('click', (event) => {
 	    event.stopPropagation();
-	    this.active = !this.active;
+	    this.#showDialog();
 	  });
 
 	  this.#textTrigger.addEventListener('click', (event) => {
@@ -339,8 +299,6 @@ export default class ATooltip extends HTMLElement {
    * @test a.when(() => mod.active === false) \\ true
    */
 	#showDialog() {
-		if (this.#tooltip.open) return;
-
 		if (this.#wrapper) {
 			this.#wrapper.classList.remove('inline');
 			this.#wrapper.classList.remove('right-edge');
@@ -376,13 +334,6 @@ export default class ATooltip extends HTMLElement {
 		}, { passive: true, signal: this.#scrollController.signal });
 	}
 
-	#reset() {
-		this.active = false;
-		requestAnimationFrame(() => {
-			this.active = true;
-		});
-	}
-
 	// -- Getters / Setters
 
 	/**
@@ -407,13 +358,7 @@ export default class ATooltip extends HTMLElement {
    */
 	set active(value) {
 		value = value != null && String(value) !== "false";
-		this.toggleAttribute('active', value)
-	}
-
-	get noicon() { return this.#noicon }
-	set noicon(value) {
-		value = value != null && String(value) !== "false";
-		this.toggleAttribute('noicon', value);
+		this.toggleAttribute('active', value);
 	}
 
 	/**
@@ -433,7 +378,7 @@ export default class ATooltip extends HTMLElement {
    * @public
    * @param {"inline" | "center" | "modal"} value - The new value for the position.
    */
-	set position(value) { this.setAttribute('position', value) }
+	set position(value) { this.setAttribute('position', value); }
 
 	/**
 	 * @test mock mod.remove() \\
@@ -444,3 +389,5 @@ export default class ATooltip extends HTMLElement {
 document.addEventListener('DOMContentLoaded', () => {
 	if (!customElements.get('a-tooltip')) customElements.define('a-tooltip', ATooltip);
 });
+
+export { ATooltip as default };

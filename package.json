@@ -1,19 +1,38 @@
 {
   "name": "a-tooltip",
-  "version": "1.0.0",
-  "description": "A web component that displays a tooltip",
+  "description": "A custom element that creates an interactive tooltip",
+  "version": "1.5.0",
+  "license": "GPL-3.0-or-later",
+  "author": "Holmes Bryant <webmaastaa@gmail.com>",
+  "homepage": "https://github.com/HolmesBryant/a-tooltip",
   "type": "module",
-  "main": "index.js",
-  "scripts": {
-    "dev": "browser-sync start --server --files \"src/*.*\"",
-    "test": "tests/tests.js",
-    "build": "rollup -c"
+  "main": "./dist/a-tooltip.min.js",
+  "module": "./dist/a-tooltip.min.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HolmesBryant/a-tooltip.git"
   },
-  "author": "Holmes Bryant <https://github.com/HolmesBryant>",
-  "license": "GPL",
+  "keywords": [
+    "module",
+    "component"
+  ],
+  "exports": {
+    ".": "./dist/a-tooltip.min.js",
+    "./src/a-tooltip.js": "./src/a-tooltip.js"
+  },
+  "files": ["dist", "src" ],
+  "bugs": {
+    "url": "https://github.com/HolmesBryant/a-tooltip/issues"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "vite"
+  },
   "devDependencies": {
-    "@rollup/plugin-terser": "^0.4.4",
-    "browser-sync": "^3.0.3",
-    "rollup": "^4.30.1"
+    "@roenlie/vite-plugin-import-css-sheet": "latest",
+    "@rollup/plugin-node-resolve": "latest",
+    "@rollup/plugin-terser": "latest",
+    "rollup": "latest",
+    "vite": "latest"
   }
 }
