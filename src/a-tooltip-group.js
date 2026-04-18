@@ -85,7 +85,6 @@ export default class ATooltipGroup extends HTMLElement {
    */
   attributeChangedCallback(attr, oldval, newval) {
     if (oldval === newval) return;
-    console.log(attr, newval);
     switch (attr) {
       case 'nohover':
         this.#nohover = this.hasAttribute('nohover');
@@ -177,7 +176,6 @@ export default class ATooltipGroup extends HTMLElement {
   async #applyDefaultsToChild(child) {
     await customElements.whenDefined('a-tooltip');
     // only apply if child hasn't defined its own
-    console.log(this.#nohover)
     if (this.#nohover !== undefined && !child.hasAttribute('nohover')) child.nohover = this.#nohover;
     if (this.#noicon !== undefined && !child.hasAttribute('noicon')) child.noicon = this.#noicon;
     if (this.#position !== undefined && !child.hasAttribute('position')) child.position = this.#position;

@@ -85,7 +85,6 @@ class ATooltipGroup extends HTMLElement {
    */
   attributeChangedCallback(attr, oldval, newval) {
     if (oldval === newval) return;
-    console.log(attr, newval);
     switch (attr) {
       case 'nohover':
         this.#nohover = this.hasAttribute('nohover');
@@ -177,7 +176,6 @@ class ATooltipGroup extends HTMLElement {
   async #applyDefaultsToChild(child) {
     await customElements.whenDefined('a-tooltip');
     // only apply if child hasn't defined its own
-    console.log(this.#nohover);
     if (this.#nohover !== undefined && !child.hasAttribute('nohover')) child.nohover = this.#nohover;
     if (this.#noicon !== undefined && !child.hasAttribute('noicon')) child.noicon = this.#noicon;
     if (this.#position !== undefined && !child.hasAttribute('position')) child.position = this.#position;
@@ -408,13 +406,6 @@ class ATooltip extends HTMLElement {
 
 	/**
 	 * Creates an instance of ATooltip
-	 *
-	 * @test mock
-	 		const elem = document.createElement('a-tooltip');
-	 		elem.id = 'test-elem';
-	 		document.body.append(elem);
-	 		a.mod = document.querySelector(`#${elem.id}`);
-	 		//console.log(a.mod) \\
 	 */
 	constructor() {
 		super();
@@ -478,11 +469,6 @@ class ATooltip extends HTMLElement {
 
 	/**
    * Called when the element is inserted into the DOM.
-   *
-	 * @test mod.#abortController instanceof AbortController \\ true
-	 * @test mod.#wrapper instanceof HTMLElement \\ true
-	 * @test mod.closeBtn instanceof HTMLButtonElement \\ true
-	 * @test mod.#buttonTrigger instanceof HTMLButtonElement \\ true
    */
 	connectedCallback() {
 		this.#abortController = new AbortController();
@@ -547,11 +533,6 @@ class ATooltip extends HTMLElement {
    * Adds event listeners for tooltip functionality.
    *
    * @private
-   *
-   * @test mod.#buttonTrigger.click(); return mod.#tooltip.open \\ true
-   * @test a.when(() => mod.active === true) \\ true
-   * @test mock mod.closeBtn.click() \\
-   * @test a.when(() => mod.active === false) \\ true
    */
 	#addListeners() {
 	  this.#buttonTrigger.addEventListener('click', (event) => {
@@ -578,9 +559,6 @@ class ATooltip extends HTMLElement {
    * Hides the tooltip dialog.
    *
    * @private
-   *
-   * @test mock mod.#showDialog() \\
-   * @test mod.#hideDialog(); return mod.#tooltip.open \\ false
    */
 	#hideDialog() {
 		this.#tooltip.close();
@@ -594,27 +572,6 @@ class ATooltip extends HTMLElement {
    * Shows the tooltip dialog based on its position.
    *
    * @private
-   *
-   * @test mock mod.position = 'modal'; \\
-   * @test info "Make sure #tooltip was opened with showModal()" \\
-   * @test mod.#showDialog(); return mod.#tooltip.position \\ "showModal"
-   * @test mock mod.#hideDialog(); mod.position = 'center' \\
-   *
-   * @test info "Make sure #tooltip was opened with show()" \\
-   * @test mod.#showDialog(); return mod.#tooltip.position \\ "show"
-   * @test mock mod.#hideDialog(); mod.position = 'inline' \\
-
-   * @test info "Make sure #tooltip is positioned so that its right edge doesn't run off the screen" \\
-   * @test
-   		const mywrapper = mod.shadowRoot.querySelector('#wrapper');
-			const rect = mywrapper.getBoundingClientRect();
-			const viewportWidth = window.innerWidth;
-			return rect.right > viewportWidth \\ false
-
-   * @test mock
-   		mod.removeAttribute('position');
-   		mod.#hideDialog(); \\
-   * @test a.when(() => mod.active === false) \\ true
    */
 	#showDialog() {
 		if (this.#tooltip.open) return;
@@ -726,8 +683,6 @@ class ATooltip extends HTMLElement {
    *
    * @public
    * @returns {string}
-   *
-   * @test mod.position \\ 'inline'
    */
 	get position() { return this.#position }
 
@@ -740,10 +695,6 @@ class ATooltip extends HTMLElement {
    */
 	set position(value) { this.setAttribute('position', value); }
 
-	/**
-	 * @test mock mod.remove() \\
-	 * @test this.#abortController \\ undefined
-	 */
 } // class
 
 document.addEventListener('DOMContentLoaded', () => {
