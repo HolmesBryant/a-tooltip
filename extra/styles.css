@@ -454,13 +454,20 @@ body {
 	.gap0
 	{ gap: 0 }
 
-	.gap2
+	.gap,
+	.flex:has(label).gap
+	{ gap: var(--gap); }
+
+	.gap2,
+	.flex:has(label).gap2
 	{ gap: calc(var(--gap) * 2) }
 
-	.gap3
+	.gap3,
+	.flex:has(label).gap3
 	{ gap: calc(var(--gap) * 3) }
 
-	.gap4
+	.gap4,
+	.flex:has(label).gap4
 	{ gap: calc(var(--gap) * 4) }
 
 	.nowrap

@@ -28,24 +28,35 @@ Include the a-tooltip tag in the body with your message.
 
 ## Slots
 
-There are two optional slots, "title" and "icon".
+- **title** Places the slotted element into the title section of the tooltip dialog.
 
-Add an element with the attribute `slot="title"` if you want your tooltip to have a title.
+- **icon** Replaces the default icon (?) with a custom one.
 
-Add an element with the attribute `slot="icon"` if you want to change the icon associated with the tooltip. The default is a question mark (?).
+- **text** Makes the slotted text interactive so it behaves the same way the icon behaves.
 
-    <a-tooltip>
-        <b slot="icon">!</b>
-        <b slot="title">The Tooltip Title</b>
-        The tooltip message.
-    </a-tooltip>
+```html
+<a-tooltip>
+    <b slot="icon">!</b>
+    <b slot="title">Tooltip Title</b>
+    <label slot="text" for="my-input">
+        A label
+    </label>
+    The tooltip message.
+</a-tooltip>
+```
 
 ## Attributes
-- **active** OPTIONAL
-    - Default: false
-    - This is a boolean attribute that, when present, automatically shows the tooltip. It has no value, its presence alone triggers the effect.
-- **position** OPTIONAL
-    - Default: "inline"
+
+- **active** (default: false)
+    - A boolean attribute that, when present, automatically shows the tooltip. It has no value, its presence alone triggers the effect.
+
+- **noicon** (default: false)
+    - A boolean attribute that, when present, hides the tooptip icon.
+
+- **nohover** (default: false)
+    - A boolean attribute that, when present, disables hover functionality. The user can still click on a tooltip trigger to see the message.
+
+- **position** (default: "inline")
     - Acceptable values: "center", "inline" or "modal"
     - Where/how to display the message. "inline" displays the message next to the tooltip icon. "center" displays the message in the center of the viewport. "modal" displays it as a modal, so nothing on the page can be selected until the message dialog closes.
 
@@ -71,6 +82,36 @@ This component exposes several custom css properties which affect the appearance
         --icon-size: 35px;
         --pad: .5rem;
     }
+
+## a-tooltip-group
+
+a-tooltip-group groups several a-tooltip elements which share common attributes. This allows you to set attributes on a single parent element (a-tooltip-group) which all child a-tooltip elements will inherit. Explicit attributes set on any child a-tooltip will be honored.
+
+```html
+    <style>
+        a-tooltip-group a-tooltip {
+            --icon-size: 1rem;
+        }
+    </style>
+
+    <a-tooltip-group
+        nohover
+        position="modal">
+
+        <div>
+            <a-tooltip>
+                <label slot="text">
+                    Foo
+                </label>
+                <b slot="title">
+                    Tooltip!
+                </b>
+            </a-tooltip>
+            <input>
+        </div>
+        ....
+    </a-tooltip-group>
+```
 
 ## Examples
 
@@ -123,6 +164,14 @@ The svg fill color **inherits** --icon-color when you include the svg directly i
         </svg>
         The tooltip message.
     </a-tooltip>
+
+### Remove the icon and make some text the tooltip trigger
+
+    <a-tooltip noicon>
+        <label slot="text" for="my-input">Click me!</label>
+        <p>Tooltip message</p>
+    </a-tooltip>
+    <input id="my-input">
 
 ### Using a square image as the icon.
 

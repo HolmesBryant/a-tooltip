@@ -6,8 +6,10 @@
  * @extends {HTMLElement}
  * @author Holmes Bryant <https://github.com/HolmesBryant>
  * @license GPL-3.0
- * @version 1.5
+ * @version 1.6
  */
+
+import ATooltipGroup from './a-tooltip-group.js';
 
 import styles from './a-tooltip-shadow.css' with {type: 'css'};
 
@@ -29,6 +31,14 @@ export default class ATooltip extends HTMLElement {
 	 * @type {boolean}
 	 */
 	#active = false;
+
+	/**
+	 * Whether hover functionality should be disabled
+	 *
+	 * @private
+	 * @type {boolean}
+	 */
+	#nohover = false;
 
 	/**
 	 * Whether the icon is omitted
@@ -68,6 +78,14 @@ export default class ATooltip extends HTMLElement {
 	 * @private
 	 */
 	#connected = false;
+
+	/**
+	 * AbortController for removing 'pointerenter' event listeners
+	 *
+	 * @private
+	 * @type {AbortController}
+	 */
+	#hoverController
 
 	/**
 	 * HTML element which wraps the icon slot
@@ -122,7 +140,7 @@ export default class ATooltip extends HTMLElement {
 	 * @static
 	 * @type {Array<string>}
 	 */
-	static observedAttributes = ['position', 'noicon','active'];
+	static observedAttributes = ['position', 'nohover', 'noicon','active'];
 
 
 	/**
@@ -150,10 +168,10 @@ export default class ATooltip extends HTMLElement {
 
 				<div id="triggers">
 					<span hidden id="text">
-						<slot name="tiptext"></slot>
+						<slot name="text"></slot>
 					</span>
 
-					<button id="show" tabindex="0" part="icon">
+					<button id="show" part="icon">
 						<slot name="icon">?</slot>
 					</button>
 				</div>
@@ -173,14 +191,14 @@ export default class ATooltip extends HTMLElement {
 	 */
 	constructor() {
 		super();
-		this.attachShadow({mode:'open'});
+		this.attachShadow({mode:'open', delegatesFocus: true});
 		this.shadowRoot.append(ATooltip.template.content.cloneNode(true));
 		this.shadowRoot.adoptedStyleSheets = [styles];
 		this.#wrapper = this.shadowRoot.querySelector('#wrapper');
 		this.#tooltip = this.shadowRoot.querySelector('dialog');
 		this.#buttonTrigger = this.shadowRoot.querySelector('#show');
 		this.#textTrigger = this.shadowRoot.querySelector('#text');
-		this.#textSlot = this.shadowRoot.querySelector('slot[name="tiptext"]');
+		this.#textSlot = this.shadowRoot.querySelector('slot[name="text"]');
 		this.#icon = this.shadowRoot.querySelector('#show');
 	}
 
@@ -205,6 +223,13 @@ export default class ATooltip extends HTMLElement {
 				this.#showDialog();
 			}
 			globalThis[abindUpdate]?.(this, attr, this.#active);
+			break;
+		case 'nohover':
+			this.#nohover = this.hasAttribute('nohover');
+			if (this.#connected) {
+				this.#canHover(this.#nohover);
+				globalThis[abindUpdate]?.(this, attr, this.#nohover);
+			}
 			break;
 		case 'noicon':
 			this.#noicon = this.hasAttribute('noicon');
@@ -241,6 +266,7 @@ export default class ATooltip extends HTMLElement {
 		const computedStyles = window.getComputedStyle(this.#wrapper);
 		this.#messageSize = computedStyles.getPropertyValue('--message-size').trim();
 		this.#addListeners();
+		this.#canHover(this.#nohover);
 
 		if (this.active) {
 			requestAnimationFrame(() => {
@@ -261,9 +287,34 @@ export default class ATooltip extends HTMLElement {
 			this.#abortController.abort();
 			this.#abortController = null;
 		}
+
+		if (this.#hoverController) {
+			this.#hoverController.abort();
+			this.#hoverController = null;
+		}
 	}
 
 	// -- Private --
+
+	#canHover(nope = true) {
+		if (!nope) {
+			this.#hoverController = new AbortController;
+			this.#buttonTrigger.addEventListener('pointerenter', (event) => {
+		    event.stopPropagation();
+		    this.active = !this.active;
+		  }, { signal: this.#hoverController.signal });
+
+		  this.#textTrigger.addEventListener('pointerenter', (event) => {
+		    event.stopPropagation();
+		    this.#showDialog();
+		  }, { signal: this.#hoverController.signal });
+		} else {
+			if (this.#hoverController) {
+				this.#hoverController.abort();
+				this.#hoverController = null;
+			}
+		}
+	}
 
 	/**
    * Adds event listeners for tooltip functionality.
@@ -390,8 +441,6 @@ export default class ATooltip extends HTMLElement {
    *
    * @public
    * @returns {boolean}
-   *
-   * @test mod.active \\ false
    */
 	get active() { return this.#active }
 
@@ -400,17 +449,46 @@ export default class ATooltip extends HTMLElement {
    * Toggles the active state and shows or hides the #tooltip accordingly.
    *
    * @public
-   * @param {any} value - The new value for the active state, always resolves to a boolean.
-   *
-   * @test mod.active = true; return mod.#tooltip.open \\ true
-   * @test mod.active = false; return mod.#tooltip.open \\ false
+   * @param {boolean} value
    */
 	set active(value) {
 		value = value != null && String(value) !== "false";
 		this.toggleAttribute('active', value)
 	}
 
+	/**
+	 * Gets the value of the #nohover property
+	 *
+	 * @public
+	 * @returns {boolean}
+	 */
+	get nohover() { return this.#nohover }
+
+	/**
+	 * Sets the value of #nohover. true disables hover functionality. false enables it.
+	 *
+	 * @public
+	 * @param {boolean} value
+	 */
+	set nohover(value) {
+		value = value != null && String(value) !== 'false';
+		this.toggleAttribute('nohover', value);
+	}
+
+	/**
+	 * Gets the value of the #noicon property
+	 *
+	 * @public
+	 * @returns {boolean}
+	 */
 	get noicon() { return this.#noicon }
+
+	/**
+	 * Sets the value of #noicon. true means no icon is visible. false means it is visible.
+	 *
+	 * @public
+	 * @param {boolean} value
+	 */
 	set noicon(value) {
 		value = value != null && String(value) !== "false";
 		this.toggleAttribute('noicon', value);

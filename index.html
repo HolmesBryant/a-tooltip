@@ -18,6 +18,15 @@
 	<link rel="stylesheet" href="extra/a-color.css">
 	<link rel="stylesheet" href="extra/a-markdown.css">
 	<link rel="stylesheet" href="dist/a-tooltip.css">
+
+	<style>
+		a-tooltip label { cursor: help; }
+		a-tooltip-group a-tooltip {
+			--icon-size: 1rem;
+			display: flex;
+			align-items: flex-end;
+		}
+	</style>
 </head>
 <body>
 	<h1>A-Tooltip Web Component</h1>
@@ -33,10 +42,11 @@
 	<h2>Demo</h2>
 
 	<section class="flex space-around">
-
 		<a-bindgroup model="dom:#demo">
 			<a-tabset active="1">
-				<strong slot="title">Attributes</strong>
+				<strong slot="title">
+					Attributes
+				</strong>
 
 				<div slot="content">
 					<div class="flex center">
@@ -46,6 +56,13 @@
 									<input type="checkbox" id="active-attr">
 								</a-bind>
 								<label for="active-attr">active</label>
+							</div>
+
+							<div class="flex">
+								<a-bind prop="nohover">
+									<input type="checkbox" id="nohover-attr">
+								</a-bind>
+								<label for="nohover-attr">nohover</label>
 							</div>
 
 							<div class="flex">
@@ -140,8 +157,9 @@
 
 		<div class="flex column">
 			<a-tooltip id="demo">
-				<label slot="tiptext">A Label</label>
-				<b slot="title">Tooltip Title</b>
+				<label slot="text">A Label</label>
+				<b slot="title"
+				>Tooltip Title</b>
 				<span>This is the tooptip message.</span>
 			</a-tooltip>
 
@@ -238,7 +256,7 @@
 			</header>
 
 			<a-tooltip style="--icon-size: 1.5ch">
-				<span slot="tiptext">A Text Trigger</span>
+				<span slot="text">A Text Trigger</span>
 				<span>The tooptip message.</span>
 			</a-tooltip>
 
@@ -247,7 +265,7 @@
 					<a-tooltip
 						style="--icon-size: 1.5ch"
 					>
-						<span slot="tiptext">
+						<span slot="text">
 							A Text Trigger
 						</span>
 
@@ -265,14 +283,14 @@
 			</header>
 
 			<a-tooltip noicon>
-				<span slot="tiptext">A Text Trigger</span>
+				<span slot="text">A Text Trigger</span>
 				<span>The tooptip message.</span>
 			</a-tooltip>
 
 			<a-code highlight>
 				<textarea>
 					<a-tooltip noicon>
-						<span slot="tiptext">
+						<span slot="text">
 							A Text Trigger
 						</span>
 
@@ -336,6 +354,72 @@
 		</div>
 	</section>
 
+	<!-- a-tooltip-group -->
+	<section>
+		<h3>Using a-tooltip-group</h3>
+		<p>a-tooltip-group groups several a-tooltip elements which share common attributes. This allows you to set attributes on a single parent element (a-tooltip-group) which all child a-tooltip elements will inherit. Explicit attributes set on any child a-tooltip will be honored.</p>
+		<div class="card flex">
+			<a-tooltip-group
+				nohover
+				position="modal"
+				class="flex flex1 gap3">
+					<div class="flex column">
+						<a-tooltip>
+							<label slot="text" for="tt-group-a">Foo</label>
+							<b slot="title">Tooltip!</b>
+						</a-tooltip>
+						<input id="tt-group-a">
+					</div>
+
+					<div class="flex column">
+						<a-tooltip>
+							<label slot="text" for="tt-group-b">Bar</label>
+							<b slot="title">Tooltip!</b>
+						</a-tooltip>
+						<input id="tt-group-b">
+					</div>
+
+					<div class="flex column">
+						<a-tooltip>
+							<label slot="text" for="tt-group-c">Baz</label>
+							<b slot="title">Tooltip!</b>
+						</a-tooltip>
+						<input id="tt-group-c">
+					</div>
+			</a-tooltip-group>
+
+			<div class="flex1">
+				<a-code highlight>
+					<textarea>
+						<style>
+							a-tooltip-group a-tooltip {
+								--icon-size: 1rem;
+							}
+						</style>
+
+						<a-tooltip-group
+							nohover
+							position="modal">
+
+							<div>
+								<a-tooltip>
+									<label slot="text">
+										Foo
+									</label>
+									<b slot="title">
+										Tooltip!
+									</b>
+								</a-tooltip>
+								<input>
+							</div>
+							....
+						</a-tooltip-group>
+					</textarea>
+				</a-code>
+			</div>
+		</div><!-- card -->
+	</section>
+
 	<!-- lightbox -->
 	<section>
 		<header>
@@ -344,6 +428,7 @@
 
 		<div class="card">
 			<a-tooltip
+				nohover
 				position = "modal"
 				style="
 					--icon-size: 100px;
@@ -366,6 +451,7 @@
 			<a-code highlight>
 				<textarea>
 					<a-tooltip
+						nohover
 						position = "modal"
 						style = "
 							--icon-size: 100px;

@@ -1,5 +1,232 @@
+/**
+ * @file a-tooltip-group.js
+ * @author Holmes Bryant <https://github.com/HolmesBryant>
+ * @license GPL-3.0
+ */
+
+/**
+ * A Custom Element (<a-tooltip-group>) that acts as a context provider for
+ * child <a-tooltip> elements. It allows setting shared properties,
+ * at a parent level to avoid repetition on children.
+ *
+ * @extends HTMLElement
+ */
+class ATooltipGroup extends HTMLElement {
+  // -- Attributes --
+
+  #nohover;
+  #noicon;
+  #position;
+
+  // -- Properties --
+
+  #childObserver;
+  #children = new Set();
+  #isConnected = false;
+  #initPending = false;
+
+  static observedAttributes = ['nohover', 'noicon', 'position'];
+
+  constructor() { super(); }
+
+  // --- Getters / Setters ---
+
+  /**
+   * Gets the value of the #nohover property.
+   *
+   * @public
+   * @returns {boolean}
+   */
+  get nohover() { return this.#nohover }
+
+  /**
+   * Adds or removes the 'nohover' attribute.
+   * true adds the attribute and disables hover functionality.
+   * false removes the attribute and enables hover functionality.
+   *
+   * @public
+   * @param {boolean} value
+   */
+  set nohover(value) {
+    value = value != null && String(value) !== "false";
+    this.toggleAttribute('nohover', value);
+  }
+
+  /**
+   * Gets the value of the #noicon property.
+   * Sets the noicon attribute:
+   * - If value is truthy, adds the attribute.
+   * - If value is falsy, removes the attribute.
+   * @type {boolean}
+   */
+  get noicon() { return this.#noicon }
+  set noicon(value) {
+    value = value != null && String(value) !== "false";
+    this.toggleAttribute('noicon', value);
+  }
+
+  /**
+   * Gets or sets the 'position' attribute.
+   * Represents whether the tooltip appears 'inline', 'center' in the screen, or as a 'modal'.
+   * @type {string}
+   */
+  get position() { return this.#position }
+  set position(value) { this.setAttribute('position', value); }
+
+  // -- Lifecycle --
+
+  /**
+   * Called when an observed attribute changes.
+   * Updates internal state and propagates changes to registered children.
+   *
+   * @param {string} attr - The attribute name.
+   * @param {string} oldval - The old value.
+   * @param {string} newval - The new value.
+   */
+  attributeChangedCallback(attr, oldval, newval) {
+    if (oldval === newval) return;
+    console.log(attr, newval);
+    switch (attr) {
+      case 'nohover':
+        this.#nohover = this.hasAttribute('nohover');
+        this.#updateChildrenDefaults();
+        break;
+      case 'noicon':
+        this.#noicon = this.hasAttribute('noicon');
+        this.#updateChildrenDefaults();
+        break;
+      case 'position':
+        this.#position = newval;
+        this.#updateChildrenDefaults();
+        break;
+    }
+  }
+
+  /**
+   * Called when the element is connected to the DOM.
+   * Initializes the group. If children are not yet present, sets up a
+   * MutationObserver to wait for them.
+   */
+  connectedCallback() {
+    this.#isConnected = true;
+    // if a-bindgroup was inserted into DOM programatically without first appending children
+    if (!this.firstElementChild) {
+      this.#childObserver = new MutationObserver(() => {
+        if (this.#isConnected && this.querySelector('a-tooltip')) {
+          if (this.#initPending) return;
+          this.#initPending = true;
+          requestAnimationFrame(() => {
+            if (!this.#isConnected) return;
+            if (this.#childObserver) {
+              this.#childObserver.disconnect();
+              this.#childObserver = null;
+            }
+
+            this.#initPending = false;
+            this.#init();
+          });
+        }
+      });
+
+      this.#childObserver.observe(this, { childList: true });
+    } else {
+      this.#init();
+    }
+  }
+
+  /**
+   * Called when disconnected from the DOM.
+   * Clears the registry of child elements.
+   */
+  disconnectedCallback() {
+    this.#children.clear();
+  }
+
+  // --- Public ---
+
+  /**
+   * Registers a child element (a-tooltip) with this group.
+   * Applies the group's configuration to the child
+   * if the child has not explicitly defined them.
+   *
+   * @param {HTMLElement} child - The child element to register.
+   * @returns {Promise<void>}
+   */
+  async register(child) {
+    this.#children.add(child);
+    this.#applyDefaultsToChild(child);
+  }
+
+  /**
+   * Unregisters a child element from the group.
+   * @param {HTMLElement} child - The child element to remove.
+   */
+  unregister(child) {
+    this.#children.delete(child);
+  }
+
+  // --- Private ---
+
+  /**
+   * Applies the group's default settings (noicon, position)
+   * to a specific child element.
+   *
+   * @private
+   * @param {HTMLElement} child - The target child element.
+   */
+  async #applyDefaultsToChild(child) {
+    await customElements.whenDefined('a-tooltip');
+    // only apply if child hasn't defined its own
+    console.log(this.#nohover);
+    if (this.#nohover !== undefined && !child.hasAttribute('nohover')) child.nohover = this.#nohover;
+    if (this.#noicon !== undefined && !child.hasAttribute('noicon')) child.noicon = this.#noicon;
+    if (this.#position !== undefined && !child.hasAttribute('position')) child.position = this.#position;
+  }
+
+  /**
+   * Initializes the group.
+   * Resolves the model instance (if needed) and registers existing children.
+   *
+   * @private
+   * @returns {Promise<void>}
+   */
+  #init() {
+    if (!this.#isConnected) return;
+    this.#registerChildren();
+  }
+
+  /**
+   * Scans the DOM for nested <a-bind> or <a-repeat> elements
+   * and registers them if they don't have their own model defined.
+   *
+   * @private
+   */
+  #registerChildren() {
+    const children = this.querySelectorAll('a-tooltip');
+    for (const child of children) {
+      if (child.closest('a-tooltip-group') === this) {
+        this.register(child);
+      }
+    }
+  }
+
+  /**
+   * Iterates over all registered children and re-applies defaults.
+   * Used when group attributes (like 'prop' or 'attr') change dynamically.
+   *
+   * @private
+   */
+  #updateChildrenDefaults() {
+    for (const child of this.#children) {
+      this.#applyDefaultsToChild(child);
+    }
+  }
+}
+
+if (!customElements.get('a-tooltip-group')) customElements.define('a-tooltip-group', ATooltipGroup);
+
 const sheet = new CSSStyleSheet();
-          sheet.replaceSync("/* @file src/a-tooltip-shadow.css */:host {display: inline-block;/* Prevents layout shift */min-height: var(--icon-size, 35px);min-width: var(--icon-size, 35px);}@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; }}::slotted(h1),::slotted(h2),::slotted(h3),::slotted(h4),::slotted(h5),::slotted(h6){ margin: 0}::slotted(img) {width: 100%;object-fit: cover;}::slotted(*) {cursor: var(--cursor, help);}::slotted(svg) {fill: var(--icon-color, white);width: 100%;}button {align-items: center;background: var(--icon-background, dodgerblue);border: 1px solid var(--border-color, silver);border-radius: var(--border-radius, 50%);box-sizing: border-box;color: var(--icon-color, white);display: inline-flex;font-weight: bold;justify-content: center;line-height: 0;outline: none;overflow: clip;}button#show {cursor: var(--cursor);font-size: calc( var(--icon-size, 35px) * .99 );height: var(--icon-size, 35px);width: var(--icon-size, 35px);}button#close {background: var(--accent-color, dodgerblue);cursor: pointer;font-size: 34px;height: 35px;width: 35px;}button:focus,button:hover {background: var(--accent-color, dodgerblue);box-shadow: 1px 1px 2px gray;}button:active{ box-shadow: inset 1px 1px 2px gray; }dialog {border: 1px solid var(--border-color);border-radius: 5px;box-shadow: 2px 2px 5px black;padding: 0;}dialog[open],dialog[open]::backdrop { animation: fadeIn .25s ease-in-out; }dialog::backdrop {background: rgba(0,0,0,0.5);}dialog > form {display: flex;justify-content: space-between;}dialog > form > button {border-bottom-right-radius: 0;border-top-left-radius: 0;border-top-right-radius: 5px;}.hide { display: none; }#message {font-size: small;overflow-wrap: normal;padding: var(--pad, .5rem);width: var(--message-size, max-content);max-height: var(--message-size, 300px);max-width: var(--message-size, 300px);}#title {padding-top: var(--pad, .5rem);padding-left: var(--pad, .5rem);}#text {display: inline-block;width: max-content;}#triggers {align-items: center;display: flex;gap: .25rem;width: max-content;}#title ::slotted(*) { margin: 0 }#wrapper { width: stretch; }#wrapper.inline { position: relative; }#wrapper.inline.right-edge { position: unset; }#wrapper.inline dialog { left: calc(var(--icon-size, 35px) + var(--pad, .5rem)); }#wrapper.inline.right-edge dialog {width: unset;left: calc(100vw - var(--message-size, 300px));right: 10px;}");
+          sheet.replaceSync("/* @file src/a-tooltip-shadow.css */:host {display: inline-block;/* Prevents layout shift */min-height: var(--icon-size, 35px);min-width: var(--icon-size, 35px);}@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; }}@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; }}::slotted(h1),::slotted(h2),::slotted(h3),::slotted(h4),::slotted(h5),::slotted(h6){ margin: 0}::slotted(img) {width: 100%;object-fit: cover;}::slotted(*) {cursor: var(--cursor, help);}::slotted(svg) {fill: var(--icon-color, white);width: 100%;}button {align-items: center;background: var(--icon-background, dodgerblue);border: 1px solid var(--border-color, silver);border-radius: var(--border-radius, 50%);box-sizing: border-box;color: var(--icon-color, white);display: inline-flex;font-weight: bold;justify-content: center;line-height: 0;outline: none;overflow: clip;}button#show {cursor: var(--cursor);font-size: calc( var(--icon-size, 35px) * .99 );height: var(--icon-size, 35px);width: var(--icon-size, 35px);}button#close {background: var(--accent-color, dodgerblue);cursor: pointer;font-size: 34px;height: 35px;width: 35px;}button:focus,button:hover {background: var(--accent-color, dodgerblue);box-shadow: 1px 1px 2px black;outline: 2px solid var(--accent-color, dodgerblue);}button:active{ box-shadow: inset 1px 1px 2px gray; }dialog {border: 1px solid var(--border-color);border-radius: 5px;box-shadow: 2px 2px 5px black;padding: 0;}dialog[open],dialog[open]::backdrop { animation: fadeIn .25s ease-in-out; }dialog:not([open]){ animation: fadeOut .25s ease-in-out; }dialog::backdrop {background: rgba(0,0,0,0.5);}dialog > form {display: flex;justify-content: space-between;}dialog > form > button {border-bottom-right-radius: 0;border-top-left-radius: 0;border-top-right-radius: 5px;}.hide { display: none; }#message {font-size: small;overflow-wrap: normal;padding: var(--pad, .5rem);width: var(--message-size, max-content);max-height: var(--message-size, 300px);max-width: var(--message-size, 300px);}#title {padding-top: var(--pad, .5rem);padding-left: var(--pad, .5rem);}#text {display: inline-block;width: max-content;}#triggers {align-items: center;display: flex;gap: .25rem;width: max-content;}#title ::slotted(*) { margin: 0 }#wrapper { width: stretch; }#wrapper.inline { position: relative; }#wrapper.inline.right-edge { position: unset; }#wrapper.inline dialog { left: calc(var(--icon-size, 35px) + var(--pad, .5rem)); }#wrapper.inline.right-edge dialog {width: unset;left: calc(100vw - var(--message-size, 300px));right: 10px;}");
 
 /**
  * ATooltip class that extends HTMLElement to create a tooltip component.
@@ -9,7 +236,7 @@ const sheet = new CSSStyleSheet();
  * @extends {HTMLElement}
  * @author Holmes Bryant <https://github.com/HolmesBryant>
  * @license GPL-3.0
- * @version 1.5
+ * @version 1.6
  */
 
 
@@ -31,6 +258,14 @@ class ATooltip extends HTMLElement {
 	 * @type {boolean}
 	 */
 	#active = false;
+
+	/**
+	 * Whether hover functionality should be disabled
+	 *
+	 * @private
+	 * @type {boolean}
+	 */
+	#nohover = false;
 
 	/**
 	 * Whether the icon is omitted
@@ -70,6 +305,14 @@ class ATooltip extends HTMLElement {
 	 * @private
 	 */
 	#connected = false;
+
+	/**
+	 * AbortController for removing 'pointerenter' event listeners
+	 *
+	 * @private
+	 * @type {AbortController}
+	 */
+	#hoverController
 
 	/**
 	 * HTML element which wraps the icon slot
@@ -124,7 +367,7 @@ class ATooltip extends HTMLElement {
 	 * @static
 	 * @type {Array<string>}
 	 */
-	static observedAttributes = ['position', 'noicon','active'];
+	static observedAttributes = ['position', 'nohover', 'noicon','active'];
 
 
 	/**
@@ -152,10 +395,10 @@ class ATooltip extends HTMLElement {
 
 				<div id="triggers">
 					<span hidden id="text">
-						<slot name="tiptext"></slot>
+						<slot name="text"></slot>
 					</span>
 
-					<button id="show" tabindex="0" part="icon">
+					<button id="show" part="icon">
 						<slot name="icon">?</slot>
 					</button>
 				</div>
@@ -175,14 +418,14 @@ class ATooltip extends HTMLElement {
 	 */
 	constructor() {
 		super();
-		this.attachShadow({mode:'open'});
+		this.attachShadow({mode:'open', delegatesFocus: true});
 		this.shadowRoot.append(ATooltip.template.content.cloneNode(true));
 		this.shadowRoot.adoptedStyleSheets = [sheet];
 		this.#wrapper = this.shadowRoot.querySelector('#wrapper');
 		this.#tooltip = this.shadowRoot.querySelector('dialog');
 		this.#buttonTrigger = this.shadowRoot.querySelector('#show');
 		this.#textTrigger = this.shadowRoot.querySelector('#text');
-		this.#textSlot = this.shadowRoot.querySelector('slot[name="tiptext"]');
+		this.#textSlot = this.shadowRoot.querySelector('slot[name="text"]');
 		this.#icon = this.shadowRoot.querySelector('#show');
 	}
 
@@ -207,6 +450,13 @@ class ATooltip extends HTMLElement {
 				this.#showDialog();
 			}
 			globalThis[abindUpdate]?.(this, attr, this.#active);
+			break;
+		case 'nohover':
+			this.#nohover = this.hasAttribute('nohover');
+			if (this.#connected) {
+				this.#canHover(this.#nohover);
+				globalThis[abindUpdate]?.(this, attr, this.#nohover);
+			}
 			break;
 		case 'noicon':
 			this.#noicon = this.hasAttribute('noicon');
@@ -243,6 +493,7 @@ class ATooltip extends HTMLElement {
 		const computedStyles = window.getComputedStyle(this.#wrapper);
 		this.#messageSize = computedStyles.getPropertyValue('--message-size').trim();
 		this.#addListeners();
+		this.#canHover(this.#nohover);
 
 		if (this.active) {
 			requestAnimationFrame(() => {
@@ -263,9 +514,34 @@ class ATooltip extends HTMLElement {
 			this.#abortController.abort();
 			this.#abortController = null;
 		}
+
+		if (this.#hoverController) {
+			this.#hoverController.abort();
+			this.#hoverController = null;
+		}
 	}
 
 	// -- Private --
+
+	#canHover(nope = true) {
+		if (!nope) {
+			this.#hoverController = new AbortController;
+			this.#buttonTrigger.addEventListener('pointerenter', (event) => {
+		    event.stopPropagation();
+		    this.active = !this.active;
+		  }, { signal: this.#hoverController.signal });
+
+		  this.#textTrigger.addEventListener('pointerenter', (event) => {
+		    event.stopPropagation();
+		    this.#showDialog();
+		  }, { signal: this.#hoverController.signal });
+		} else {
+			if (this.#hoverController) {
+				this.#hoverController.abort();
+				this.#hoverController = null;
+			}
+		}
+	}
 
 	/**
    * Adds event listeners for tooltip functionality.
@@ -392,8 +668,6 @@ class ATooltip extends HTMLElement {
    *
    * @public
    * @returns {boolean}
-   *
-   * @test mod.active \\ false
    */
 	get active() { return this.#active }
 
@@ -402,17 +676,46 @@ class ATooltip extends HTMLElement {
    * Toggles the active state and shows or hides the #tooltip accordingly.
    *
    * @public
-   * @param {any} value - The new value for the active state, always resolves to a boolean.
-   *
-   * @test mod.active = true; return mod.#tooltip.open \\ true
-   * @test mod.active = false; return mod.#tooltip.open \\ false
+   * @param {boolean} value
    */
 	set active(value) {
 		value = value != null && String(value) !== "false";
 		this.toggleAttribute('active', value);
 	}
 
+	/**
+	 * Gets the value of the #nohover property
+	 *
+	 * @public
+	 * @returns {boolean}
+	 */
+	get nohover() { return this.#nohover }
+
+	/**
+	 * Sets the value of #nohover. true disables hover functionality. false enables it.
+	 *
+	 * @public
+	 * @param {boolean} value
+	 */
+	set nohover(value) {
+		value = value != null && String(value) !== 'false';
+		this.toggleAttribute('nohover', value);
+	}
+
+	/**
+	 * Gets the value of the #noicon property
+	 *
+	 * @public
+	 * @returns {boolean}
+	 */
 	get noicon() { return this.#noicon }
+
+	/**
+	 * Sets the value of #noicon. true means no icon is visible. false means it is visible.
+	 *
+	 * @public
+	 * @param {boolean} value
+	 */
 	set noicon(value) {
 		value = value != null && String(value) !== "false";
 		this.toggleAttribute('noicon', value);

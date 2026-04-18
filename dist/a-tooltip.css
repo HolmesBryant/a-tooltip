@@ -1,5 +1,6 @@
 a-tooltip {
-	--accent-color:dodgerblue;
+	/* these variables affect the css in the shadow root */
+	--accent-color:orange;
 	--border-color: silver;
 	--border-radius: 50%;
 	--cursor: help;
