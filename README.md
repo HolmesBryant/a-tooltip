@@ -209,3 +209,10 @@ Normally the tooltip icon displays as a circle, but with css you can coerce it i
         text-align: center;
     }
 
+## Change Log
+
+- v 1.6 Introduce a-tooltip-group to allow parent-level defaults for child a-tooltip elements and register/unregister children. Add 'nohover' attribute and hover controller to ATooltip so hover can be disabled/enabled programmatically or via group inheritance; rename 'tiptext' slot to 'text' and enable delegatesFocus on the shadow root. Update CSS to include fadeOut, focus outline, and change accent variable. Bump ATooltip version to 1.6 and update README and examples to document new slots, attributes (nohover, noicon) and the a-tooltip-group usage. Build artifacts and minified files were regenerated accordingly.
+
+- v 1.5 Tuned many methods of ATooltip for performance. Reconfigured devDependencies.
+
+- v 1.0 yay!
