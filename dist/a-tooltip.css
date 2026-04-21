@@ -9,6 +9,8 @@ a-tooltip {
 	--icon-color: white;
 	--icon-size: 35px;
 	--pad: .5rem;
+
+	white-space: normal;
 }
 
 /* prevent FOUC */
